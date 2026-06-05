@@ -247,8 +247,8 @@ async function openMarketBrowser() {
   try {
     const res = await window.tfdApi.scrape(); // This now just opens the window
     if (res.status === 'opened') {
-      setStatus('idle', 'Browser open. Navigate to the mod and scroll down, then click Extract.');
-      showToast('🌐 Market browser opened. Scroll down to load listings, then click Extract Loaded Data.');
+      setStatus('idle', 'Browser open. Navigate to the mod, then click Auto-Scroll & Extract.');
+      showToast('🌐 Market browser opened. Navigate to your module, then click Auto-Scroll & Extract!');
     }
   } catch (err) {
     showToast('Failed to open browser');
@@ -266,7 +266,8 @@ async function extractData() {
     return;
   }
 
-  setStatus('scraping', 'Extracting data from browser...');
+  setStatus('scraping', 'Auto-Scrolling and Extracting data...');
+  showToast('🔄 Auto-scrolling to load all hidden listings... Please wait!');
   try {
     // This executes parser.js in the open window
     const result = await window.tfdApi.scrape(selectedMod, platformSelect.value);

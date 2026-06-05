@@ -110,7 +110,30 @@ function registerIPC() {
       // Since parser.js is written as a module, we just read it and append a call to it.
       const injectCode = `
         ${parserCode.replace('module.exports = { parseMarketPage };', '')}
-        parseMarketPage();
+        
+        (async function autoScrollAndParse() {
+          return new Promise((resolve) => {
+            let lastHeight = 0;
+            let unchangedCount = 0;
+            
+            const timer = setInterval(() => {
+              window.scrollTo(0, document.body.scrollHeight);
+              let currentHeight = document.body.scrollHeight;
+              
+              if (currentHeight === lastHeight) {
+                unchangedCount++;
+                // Stop if height hasn't changed for ~1.5s
+                if (unchangedCount >= 3) {
+                  clearInterval(timer);
+                  resolve(parseMarketPage());
+                }
+              } else {
+                lastHeight = currentHeight;
+                unchangedCount = 0;
+              }
+            }, 500);
+          });
+        })();
       `;
 
       const modules = await marketWindow.webContents.executeJavaScript(injectCode);
