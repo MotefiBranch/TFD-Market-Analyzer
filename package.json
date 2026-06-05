@@ -1,0 +1,46 @@
+{
+  "name": "tfd-market-analyzer",
+  "version": "1.0.0",
+  "description": "The First Descendant Market Analysis Bot — Ancestral Mod Price Tracker",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "build": "electron-builder",
+    "build:win": "electron-builder --win"
+  },
+  "dependencies": {
+    "chart.js": "^4.4.7",
+    "electron-store": "^10.0.0",
+    "sql.js": "^1.11.0",
+    "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "electron": "^33.3.1",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "com.tfd.market-analyzer",
+    "productName": "TFD Market Analyzer",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "**/*",
+      "!dist/**",
+      "!node_modules/.cache/**"
+    ],
+    "extraResources": [
+      {
+        "from": "assets/",
+        "to": "assets"
+      }
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icons/icon.ico"
+    }
+  },
+  "author": "TFD Market Analyzer",
+  "license": "MIT"
+}

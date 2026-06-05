@@ -1,0 +1,425 @@
+10Caliber
+●
+mugenkidou#3673 · MR 28
+Max MP % 4.5%[x]
+Skill Cost % -0.113%[+]
+Max Shield % 51.1%[x]
+100% match
+10Caliber
+●
+自闭历程#0125 · MR 24
+Skill Duration UP % 24.4%[+] 38.8%[+]
+Max MP % 17%[x] 27%[x]
+Skill Cooldown % -17%[+] -27%[+]
+Skill Critical Hit Rate % -119.4%[x] -190.2%[x]
+100% match
+20Caliber
+●
+KRFooSsKSA#6966 · MR 31
+Skill Duration UP % 23.7%[+] 32.2%[+]
+Skill Critical Hit Damage % 132.8%[x] 180.9%[x]
+Fire Skill Power Boost Ratio % 37.9%[+] 51.6%[+]
+100% match
+20Caliber
+●
+LuderChrist#4486 · MR 33
+Dimension Skill Modifier % 69.4%[+] 110.6%[+]
+Skill Critical Hit Rate % 227%[x] 361.7%[x]
+Max HP % 92.1%[x] 146.7%[x]
+Dimension Skill Power Boost Ratio % -5.1%[+] -8.1%[+]
+100% match
+20Caliber
+●
+Hashtag shootme#2122 · MR 32
+Singular Skill Power Boost Ratio % 11.1%[+] 15.1%[+]
+Skill Critical Hit Rate % 171.1%[x] 233.1%[x]
+Skill Critical Hit Damage % 132.9%[x] 181%[x]
+100% match
+20Caliber
+●
+manicoco-Hanbei#2903 · MR 27
+Skill Cost % -18.8%[+] -25.6%[+]
+Dimension Skill Modifier % 76.4%[+] 104%[+]
+Max Shield % 79.1%[x] 107.7%[x]
+100% match
+20Caliber
+●
+아이비#8491 · MR 29
+Max HP % 37.9%[x] 51.6%[x]
+Fire Skill Power Boost Ratio % 49.4%[+] 67.3%[+]
+Skill Effect Range % 44.9%[+] 61.1%[+]
+100% match
+30Caliber
+●
+ImTender#1489 · MR 28
+Singular Skill Power Boost Ratio % 10.3%[+] 14%[+]
+Skill Critical Hit Rate % 236.5%[x] 322.2%[x]
+Singular Skill Modifier % 74%[+] 100.8%[+]
+100% match
+30Caliber
+●
+wiRSoXx#8969 · MR 22
+Singular Skill Power Boost Ratio % 35%[+] 47.6%[+]
+Fire Skill Power Boost Ratio % 36.4%[+] 49.5%[+]
+Skill Critical Hit Damage % 106.4%[x] 144.9%[x]
+100% match
+30Caliber
+●
+Hashtag shootme#2122 · MR 32
+Skill Critical Hit Damage % 46.9%[x] 63.8%[x]
+Skill Effect Range % 52%[+] 70.8%[+]
+Max Shield % 116.7%[x] 158.9%[x]
+100% match
+30Caliber
+●
+Bruno3090#1248 · MR 28
+Skill Duration UP % 26.7%[+] 42.5%[+]
+Max MP % 9.1%[x] 14.4%[x]
+Skill Cost % -19.8%[+] -31.5%[+]
+Max Shield % -78.5%[x] -125.1%[x]
+100% match
+40Caliber
+●
+RedFrost#0367 · MR 30
+Skill Cooldown % -15.3%[+] -24.3%[+]
+Dimension Skill Modifier % 29.7%[+] 47.3%[+]
+DEF % 202.5%[x] 322.7%[x]
+Max MP % -8.8%[x] -14%[x]
+100% match
+40Caliber
+●
+hetic#9715 · MR 32
+DEF % 144.5%[x] 196.8%[x]
+Skill Cost % -19.6%[+] -26.6%[+]
+Skill Critical Hit Damage % 162.3%[x] 221.1%[x]
+100% match
+50Caliber
+●
+Col_Kurtz212#1607 · MR 33
+Skill Critical Hit Damage % 97.5%[x] 155.3%[x]
+Max HP % 33.8%[x] 53.8%[x]
+Skill Effect Range % 73%[+] 116.3%[+]
+Dimension Skill Modifier % -22.2%[+] -35.3%[+]
+100% match
+50Caliber
+●
+Col_Kurtz212#1607 · MR 33
+Skill Cost % -18.6%[+] -25.3%[+]
+Skill Critical Hit Rate % 68.6%[x] 93.4%[x]
+Skill Critical Hit Damage % 149.6%[x] 203.8%[x]
+100% match
+50Caliber
+●
+瞌睡大魔王#8552 · MR 21
+Singular Skill Modifier % 33.4%[+] 45.5%[+]
+Skill Critical Hit Damage % 162.6%[x] 221.5%[x]
+Fire Skill Power Boost Ratio % 48.3%[+] 65.8%[+]
+100% match
+50Caliber
+●
+AlexCT93#1106 · MR 21
+Dimension Skill Power Boost Ratio % 13.3%[+] 18.1%[+]
+Skill Cooldown % -19.3%[+] -26.2%[+]
+Max MP % 8.6%[x] 11.7%[x]
+100% match
+50Caliber
+●
+LuderChrist#4486 · MR 33
+Singular Skill Modifier % 20.9%[+] 33.3%[+]
+Max MP % 7.3%[x] 11.6%[x]
+Skill Critical Hit Damage % 163.1%[x] 259.9%[x]
+Max Shield % -83.4%[x] -132.9%[x]
+100% match
+50Caliber
+●
+LuderChrist#4486 · MR 33
+Skill Duration UP % 15.2%[+] 34.1%[+]
+Skill Critical Hit Damage % 147.9%[x] 332.3%[x]
+Max MP % -8.4%[x] -18.8%[x]
+100% match
+50Caliber
+●
+Kei_Twinn#7699 · MR 33
+Fire Skill Power Boost Ratio % 25.1%[+] 40%[+]
+Skill Cooldown % -16.9%[+] -26.9%[+]
+Skill Duration UP % 43.6%[+] 69.4%[+]
+Skill Critical Hit Rate % -120.6%[x] -192.2%[x]
+100% match
+50Caliber
+●
+Momon#8249 · MR 18
+Dimension Skill Power Boost Ratio % 14.7%[+] 33%[+]
+Singular Skill Modifier % 64.6%[+] 145.1%[+]
+Max MP % -7.8%[x] -17.5%[x]
+100% match
+50Caliber
+●
+Soulanz#3204 · MR 32
+Skill Effect Range % 73.5%[+] 100.1%[+]
+Skill Critical Hit Damage % 153.6%[x] 209.2%[x]
+Max Shield % 143%[x] 194.8%[x]
+100% match
+50Caliber
+●
+ChefGus123#9210 · MR 20
+Dimension Skill Power Boost Ratio % 18.7%[+] 25.4%[+]
+Fire Skill Power Boost Ratio % 39.9%[+] 54.3%[+]
+Skill Duration UP % 16.9%[+] 23%[+]
+100% match
+50Caliber
+●
+LeoMous#7794 · MR 32
+Skill Critical Hit Damage % 123.8%[x] 222.5%[x]
+Skill Cooldown % -6.3%[+] -11.3%[+]
+100% match
+50Caliber
+●
+Samgybsal#9214 · MR 23
+Singular Skill Power Boost Ratio % 32.7%[+] 44.5%[+]
+Skill Cooldown % -9.3%[+] -12.6%[+]
+Skill Effect Range % 33%[+] 44.9%[+]
+100% match
+70Caliber
+●
+xDiugu#5018 · MR 32
+Skill Cooldown % -14.2%[+] -25.5%[+]
+Skill Critical Hit Damage % 100.7%[x] 181%[x]
+100% match
+80Caliber
+●
+Bell#5400 · MR 16
+Skill Critical Hit Rate % 88.7%[x] 120.8%[x]
+Fire Skill Power Boost Ratio % 19.9%[+] 27.1%[+]
+Max Shield % 177.7%[x] 242.1%[x]
+100% match
+80Caliber
+●
+xDiugu#5018 · MR 32
+Skill Critical Hit Damage % 103.5%[x] 186%[x]
+Singular Skill Modifier % 74.2%[+] 133.4%[+]
+100% match
+100Caliber
+●
+Mikulaz0Uwu2113#8925 · MR 32
+Skill Critical Hit Damage % 157.4%[x] 250.8%[x]
+DEF % 117%[x] 186.4%[x]
+Fire Skill Power Boost Ratio % 16.2%[+] 25.8%[+]
+Singular Skill Modifier % -37.2%[+] -59.2%[+]
+100% match
+100Caliber
+●
+DopeyNeptune198#6357 · MR 33
+DEF % 96.6%[x] 131.6%[x]
+Skill Critical Hit Damage % 160.6%[x] 218.8%[x]
+Singular Skill Modifier % 36.3%[+] 49.4%[+]
+100% match
+100Caliber
+●
+ExtcTann#5430 · MR 17
+Fire Skill Power Boost Ratio % 53.5%[+] 96.1%[+]
+Skill Cost % -15.6%[+] -28%[+]
+100% match
+100Caliber
+●
+BoucleMoka83837#9455 · MR 21
+Skill Critical Hit Rate % 217.2%[x] 295.9%[x]
+Skill Critical Hit Damage % 77.4%[x] 105.4%[x]
+Skill Duration UP % 34.6%[+] 47.1%[+]
+100% match
+100Caliber
+●
+Riztsu#7711 · MR 28
+Skill Cooldown % -11.4%[+] -20.4%[+]
+Skill Critical Hit Damage % 110.5%[x] 198.6%[x]
+100% match
+100Caliber
+●
+martuhai#1355 · MR 33
+Skill Critical Hit Damage % 155.3%[x] 247.5%[x]
+Fire Skill Power Boost Ratio % 43.5%[+] 69.3%[+]
+Skill Effect Range % 74.5%[+] 118.7%[+]
+Skill Cooldown % 5.5%[+] 8.7%[+]
+100% match
+100Caliber
+●
+Momon#8249 · MR 18
+Dimension Skill Power Boost Ratio % 29.3%[+] 39.9%[+]
+Skill Critical Hit Rate % 92.9%[x] 126.5%[x]
+Singular Skill Modifier % 20.8%[+] 28.3%[+]
+100% match
+120Caliber
+●
+Night7009#7329 · MR 17
+Skill Cooldown % -14.7%[+] -23.4%[+]
+Dimension Skill Power Boost Ratio % 28.5%[+] 45.4%[+]
+Skill Effect Range % 26%[+] 41.4%[+]
+Skill Critical Hit Damage % -66.1%[x] -105.3%[x]
+100% match
+150Caliber
+●
+SannadaYkimura#4048 · MR 33
+Skill Critical Hit Damage % 147.4%[x] 265%[x]
+Max HP % 32.3%[x] 58%[x]
+100% match
+150Caliber
+●
+Ni_Ne17#1497 · MR 16
+Fire Skill Power Boost Ratio % 25.3%[+] 40.3%[+]
+Skill Cost % -20.4%[+] -32.5%[+]
+Skill Critical Hit Rate % 74.1%[x] 118%[x]
+Max Shield % -82.8%[x] -131.9%[x]
+100% match
+150Caliber
+●
+비수#2990 · MR 33
+Skill Effect Range % 68.1%[+] 108.5%[+]
+Max HP % 68.3%[x] 108.8%[x]
+Fire Skill Power Boost Ratio % 54.1%[+] 86.2%[+]
+Skill Cost % 3.6%[+] 5.7%[+]
+100% match
+150Caliber
+●
+GameBug#9647 · MR 33
+Singular Skill Modifier % 71%[+] 113.1%[+]
+Skill Critical Hit Rate % 143%[x] 227.9%[x]
+Dimension Skill Power Boost Ratio % 37.1%[+] 59.1%[+]
+Skill Duration UP % -9.3%[+] -14.8%[+]
+100% match
+150Caliber
+●
+GameBug#9647 · MR 33
+Skill Critical Hit Damage % 132%[x] 179.8%[x]
+Fire Skill Power Boost Ratio % 34.8%[+] 47.4%[+]
+Dimension Skill Modifier % 67.9%[+] 92.5%[+]
+100% match
+180Caliber
+●
+ᐠVᐟ#5837 · MR 33
+Dimension Skill Power Boost Ratio % 10.4%[+] 16.5%[+]
+Skill Critical Hit Damage % 149.6%[x] 238.4%[x]
+Max Shield % 82.7%[x] 131.8%[x]
+Skill Cost % 9.7%[+] 15.4%[+]
+100% match
+200Caliber
+●
+水夏#8571 · MR 33
+Skill Critical Hit Damage % 148.6%[x] 202.4%[x]
+Skill Duration UP % 27.6%[+] 37.5%[+]
+Dimension Skill Modifier % 68.7%[+] 93.5%[+]
+100% match
+200Caliber
+●
+SuperRetroPixel#8964 · MR 32
+Max Shield % 192%[x] 345.2%[x]
+Skill Critical Hit Rate % 248.3%[x] 446.4%[x]
+100% match
+200Caliber
+●
+Bubby Ryy#8800 · MR 24
+Dimension Skill Power Boost Ratio % 37.1%[+] 50.5%[+]
+Dimension Skill Modifier % 75.4%[+] 102.7%[+]
+Skill Cooldown % -16.9%[+] -23%[+]
+100% match
+200Caliber
+●
+rvrm#6678 · MR 33
+Skill Critical Hit Rate % 224.7%[x] 504.8%[x]
+Max MP % 17.1%[x] 38.4%[x]
+Dimension Skill Modifier % -23.4%[+] -52.5%[+]
+100% match
+200Caliber
+●
+Targaryen117209#8812 · MR 33
+Dimension Skill Power Boost Ratio % 24.4%[+] 33.2%[+]
+Skill Duration UP % 29.6%[+] 40.3%[+]
+Skill Critical Hit Damage % 143.3%[x] 195.2%[x]
+100% match
+200Caliber
+●
+青青草原杠把子#3768 · MR 33
+Fire Skill Power Boost Ratio % 41.1%[+] 55.9%[+]
+Skill Critical Hit Damage % 92.3%[x] 125.7%[x]
+Skill Critical Hit Rate % 215.2%[x] 293.2%[x]
+100% match
+200Caliber
+●
+PauloDias019#4796 · MR 33
+Dimension Skill Modifier % 66.3%[+] 105.6%[+]
+Skill Cooldown % -6.9%[+] -10.9%[+]
+Skill Critical Hit Rate % 247.2%[x] 393.9%[x]
+Max MP % -8.7%[x] -13.8%[x]
+100% match
+200Caliber
+●
+saltyShark52920#4484 · MR 18
+Skill Cost % -7.8%[+] -12.4%[+]
+Skill Critical Hit Rate % 192.6%[x] 306.9%[x]
+Skill Effect Range % 47.4%[+] 75.5%[+]
+Dimension Skill Power Boost Ratio % -8.3%[+] -13.2%[+]
+100% match
+200Caliber
+●
+lostlio#3896 · MR 33
+Skill Duration UP % 27.3%[+] 49%[+]
+Skill Critical Hit Damage % 154.2%[x] 277.2%[x]
+100% match
+200Caliber
+●
+sabbir1121#4744 · MR 23
+Fire Skill Power Boost Ratio % 49.5%[+] 88.9%[+]
+Max HP % 62.7%[x] 112.7%[x]
+100% match
+200Caliber
+●
+Maylis#3340 · MR 26
+Singular Skill Modifier % 29.7%[+] 40.4%[+]
+Skill Duration UP % 12.9%[+] 17.5%[+]
+Dimension Skill Power Boost Ratio % 29.7%[+] 40.4%[+]
+100% match
+250Caliber
+●
+BLUEBERRY3231#6403 · MR 30
+Fire Skill Power Boost Ratio % 48.5%[+] 87.1%[+]
+Skill Critical Hit Rate % 218.4%[x] 392.6%[x]
+100% match
+250Caliber
+●
+MacDos91#2644 · MR 20
+Skill Effect Range % 50.2%[+] 68.3%[+]
+Skill Cost % -19.3%[+] -26.2%[+]
+Max MP % 7.3%[x] 9.9%[x]
+100% match
+300Caliber
+●
+Halloween Son#0574 · MR 26
+Fire Skill Power Boost Ratio % 50.3%[+] 68.5%[+]
+Dimension Skill Modifier % 73.9%[+] 100.6%[+]
+Skill Critical Hit Damage % 131.9%[x] 179.7%[x]
+100% match
+300Caliber
+●
+Kevinchief22#3218 · MR 28
+Skill Critical Hit Damage % 141.7%[x] 193%[x]
+Skill Cooldown % -6%[+] -8.1%[+]
+Skill Duration UP % 40.3%[+] 54.9%[+]
+100% match
+300Caliber
+●
+Hexe11765#4795 · MR 30
+Skill Critical Hit Rate % 188.8%[x] 257.2%[x]
+Skill Critical Hit Damage % 155.5%[x] 211.8%[x]
+Fire Skill Power Boost Ratio % 15.7%[+] 21.3%[+]
+100% match
+300Caliber
+●
+Жадный Еврей#9617 · MR 33
+Skill Critical Hit Rate % 193%[x] 262.9%[x]
+Singular Skill Power Boost Ratio % 32%[+] 43.5%[+]
+Skill Critical Hit Damage % 140.6%[x] 191.5%[x]
+100% match
+300Caliber
+●
+PapMAN01#3579 · MR 25
+Singular Skill Modifier % 75.3%[+] 102.5%[+]
+Skill Critical Hit Rate % 218.6%[x] 297.8%[x]
+Max HP % 97.8%[x] 133.2%[x]

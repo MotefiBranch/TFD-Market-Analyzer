@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TFD Market Analyzer</title>
+  <link rel="stylesheet" href="index.css">
+</head>
+<body>
+  <!-- Title Bar -->
+  <div class="title-bar" id="title-bar">
+    <div class="title-bar__brand">
+      <div class="icon"></div>
+      <span>TFD Market Analyzer</span>
+    </div>
+    <div class="title-bar__controls">
+      <button class="title-bar__btn" id="btn-minimize" title="Minimize">─</button>
+      <button class="title-bar__btn" id="btn-maximize" title="Maximize">□</button>
+      <button class="title-bar__btn close" id="btn-close" title="Close">✕</button>
+    </div>
+  </div>
+
+  <div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <!-- Search Section -->
+      <div class="sidebar__section">
+        <div class="sidebar__title"><span class="dot"></span> Module Search</div>
+        <div class="search-wrapper">
+          <span class="search-icon">🔍</span>
+          <input type="text" class="search-input" id="mod-search" placeholder="Search ancestral mods..." autocomplete="off">
+          <div class="autocomplete-dropdown" id="search-dropdown"></div>
+        </div>
+        <div id="selected-mod-display" class="hidden" style="margin-top: 10px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <span id="selected-mod-name" style="font-size:14px;font-weight:700;color:var(--accent-blue);"></span>
+            <button class="btn--ghost btn--sm" id="clear-mod" style="font-size:11px;">Clear</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stat Builder Section -->
+      <div class="sidebar__section">
+        <div class="sidebar__title"><span class="dot" style="background:var(--accent-purple);box-shadow:0 0 6px rgba(139,92,246,0.4);"></span> Target Stats</div>
+        <div id="stat-rows"></div>
+        <button class="btn btn--add btn--sm btn--full mt-8" id="add-stat-btn">+ Add Stat</button>
+      </div>
+
+      <!-- Actions Section -->
+      <div class="sidebar__section">
+        <div class="sidebar__title"><span class="dot" style="background:var(--accent-green);box-shadow:0 0 6px rgba(16,185,129,0.4);"></span> Actions</div>
+        <div class="flex flex-col gap-8">
+          <button class="btn btn--primary btn--full" id="analyze-btn">📊 Analyze Prices</button>
+          <button class="btn btn--secondary btn--full" id="scrape-btn">🌐 Open Market Browser</button>
+          <button class="btn btn--add btn--full btn--sm" id="extract-btn">⬇️ Extract Loaded Data</button>
+        </div>
+      </div>
+
+      <!-- Removed Tracked Mods Section -->
+
+      <!-- Settings -->
+      <div class="sidebar__section">
+        <div class="flex items-center justify-between">
+          <span style="font-size:11px;color:var(--text-muted);">Platform</span>
+          <select id="platform-select" style="padding:4px 8px;background:var(--bg-elevated);border:1px solid var(--glass-border);border-radius:var(--radius-sm);color:var(--text-primary);font-size:12px;">
+            <option value="PC">PC (Steam)</option>
+            <option value="PS">PlayStation</option>
+            <option value="XBOX">Xbox</option>
+          </select>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content" id="main-content">
+      <!-- Empty State (shown initially) -->
+      <div class="empty-state" id="empty-state">
+        <div class="empty-state__icon">⬡</div>
+        <div class="empty-state__title">TFD Market Analyzer</div>
+        <div class="empty-state__desc">
+          Search for an ancestral module, configure your target stats, and hit <strong>Analyze Prices</strong> to see pricing trends, market analysis, and matching listings.
+        </div>
+        <div style="margin-top:12px;display:flex;gap:8px;">
+          <button class="btn btn--primary" id="empty-scrape-btn">🌐 Open Market Browser</button>
+        </div>
+      </div>
+
+      <!-- Analysis Results (hidden initially) -->
+      <div id="analysis-results" class="hidden">
+        <!-- Tab Navigation -->
+        <div class="tab-nav" id="tab-nav">
+          <button class="tab-btn active" data-tab="30">30 Days</button>
+          <button class="tab-btn" data-tab="7">7 Days</button>
+          <button class="tab-btn" data-tab="today">Today</button>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="summary-grid" id="summary-grid">
+          <div class="summary-card">
+            <div class="summary-card__label">Median Price</div>
+            <div class="summary-card__value" id="card-median">—</div>
+            <div class="summary-card__change stable" id="card-median-change">—</div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-card__label">7-Day Average</div>
+            <div class="summary-card__value" id="card-7d-avg">—</div>
+            <div class="summary-card__change stable" id="card-7d-change">—</div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-card__label">30-Day Average</div>
+            <div class="summary-card__value" id="card-30d-avg">—</div>
+            <div class="summary-card__change stable" id="card-30d-change">—</div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-card__label">Price Trend</div>
+            <div class="summary-card__value" id="card-trend">—</div>
+            <div class="summary-card__change stable" id="card-listings">— listings</div>
+          </div>
+        </div>
+
+        <!-- Chart -->
+        <div class="chart-container" id="chart-container">
+          <canvas id="price-chart"></canvas>
+        </div>
+
+        <!-- Listings Grid -->
+        <div class="listings-header">
+          <h3 id="listings-title">Matching Listings</h3>
+          <span class="listings-count" id="listings-count">0 results</span>
+        </div>
+        <div class="listings-grid" id="listings-grid"></div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <div class="status-bar__indicator">
+      <div class="status-bar__dot idle" id="status-dot"></div>
+      <span id="status-text">Ready</span>
+    </div>
+    <span id="db-stats" style="font-family:var(--font-mono);">—</span>
+  </div>
+
+  <!-- Removed Scrape Overlay -->
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
