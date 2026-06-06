@@ -233,9 +233,23 @@ function registerIPC() {
   // Removed scheduler and tracked mod IPC handlers for public release
 
   // Settings
+  const settingsPath = path.join(app.getPath('userData'), 'settings.json');
+  if (fs.existsSync(settingsPath)) {
+    try {
+      settings = { ...settings, ...JSON.parse(fs.readFileSync(settingsPath, 'utf8')) };
+    } catch (e) {
+      console.error('Failed to load settings', e);
+    }
+  }
+
   ipcMain.handle('settings:get', () => settings);
   ipcMain.handle('settings:update', (_e, newSettings) => {
     settings = { ...settings, ...newSettings };
+    try {
+      fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 2));
+    } catch (e) {
+      console.error('Failed to save settings', e);
+    }
     return { success: true };
   });
 
