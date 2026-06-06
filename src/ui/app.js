@@ -553,11 +553,12 @@ function renderListings(listings) {
         <div class="listing-card__price">${formatPrice(l.price)}<span>Caliber</span></div>
         <div class="listing-card__seller">
           <span class="${statusClass}">●</span>
-          ${escapeHtml(l.seller_name || l.sellerName || 'Unknown')}
-          ${l.seller_rank || l.sellerRank ? ` · MR ${escapeHtml(l.seller_rank || l.sellerRank)}` : ''}
-          ${l.reroll_count !== undefined && l.reroll_count > 0 ? ` · Rerolls <span style="color:var(--text-primary);font-weight:600;">${l.reroll_count}</span>` : ''}
-          ${l.required_rank ? ` · Req MR ${escapeHtml(l.required_rank)}` : ''}
-          ${l.socket_type ? ` · Socket: ${escapeHtml(l.socket_type)}` : ''}
+          <span style="display:inline-block;">
+            ${escapeHtml(l.seller_name || l.sellerName || 'Unknown')}
+            ${l.seller_rank || l.sellerRank ? ` · MR ${escapeHtml(l.seller_rank || l.sellerRank)}` : ''}
+            ${l.reroll_count !== undefined && l.reroll_count > 0 ? ` · Rerolls <strong style="color:var(--text-primary);">${l.reroll_count}</strong>` : ''}
+            ${l.required_rank ? ` · Req MR ${escapeHtml(l.required_rank)}` : ''}
+          </span>
         </div>
         <div class="listing-card__stats">
           ${stats.map(s => {
