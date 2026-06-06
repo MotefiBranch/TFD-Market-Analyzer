@@ -556,8 +556,16 @@ function renderListings(listings) {
         </div>
         <div class="listing-card__stats">
           ${stats.map(s => {
-            const cls = s.isPositive ? 'positive' : s.isNegative ? 'negative' : 'neutral';
-            const cleanValue = String(s.statValue || '').replace(/\[\+\]|\[\-\]/g, '').trim();
+            let cls = s.isPositive ? 'positive' : s.isNegative ? 'negative' : 'neutral';
+            
+            const rawValue = String(s.statValue || '');
+            if (rawValue.includes('[x]')) {
+              cls = 'ultimate';
+            } else if (cls === 'neutral') {
+              cls = 'positive';
+            }
+
+            const cleanValue = rawValue.replace(/\[\+\]|\[\-\]|\[x\]/g, '').trim();
             return `<span class="stat-chip ${cls}">${escapeHtml(s.statName || '')} ${escapeHtml(cleanValue)}</span>`;
           }).join('')}
         </div>
