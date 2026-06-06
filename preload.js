@@ -8,6 +8,7 @@ const { contextBridge, ipcRenderer } = require('electron');
 contextBridge.exposeInMainWorld('tfdApi', {
   // ── Scraper ──
   scrape: (modName, platform) => ipcRenderer.invoke('scrape:run', modName, platform),
+  scroll: () => ipcRenderer.invoke('scrape:scroll'),
   getScrapeStatus: () => ipcRenderer.invoke('scrape:status'),
   abortScrape: () => ipcRenderer.invoke('scrape:abort'),
 

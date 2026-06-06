@@ -204,6 +204,7 @@ function initActions() {
   analyzeBtn.addEventListener('click', runAnalysis);
   scrapeBtn.addEventListener('click', openMarketBrowser);
   $('empty-scrape-btn')?.addEventListener('click', openMarketBrowser);
+  $('scroll-btn')?.addEventListener('click', autoScrollBrowser);
   $('extract-btn')?.addEventListener('click', extractData);
 }
 
@@ -247,12 +248,30 @@ async function openMarketBrowser() {
   try {
     const res = await window.tfdApi.scrape(); // This now just opens the window
     if (res.status === 'opened') {
-      setStatus('idle', 'Browser open. Navigate to the mod, then click Auto-Scroll & Extract.');
-      showToast('🌐 Market browser opened. Navigate to your module, then click Auto-Scroll & Extract!');
+      setStatus('idle', 'Browser open. Navigate to the mod, then click Auto-Scroll.');
+      showToast('🌐 Market browser opened. Navigate to your module, then click Auto-Scroll!');
     }
   } catch (err) {
     showToast('Failed to open browser');
     setStatus('error', 'Error opening browser');
+  }
+}
+
+async function autoScrollBrowser() {
+  setStatus('scraping', 'Auto-Scrolling...');
+  showToast('🔄 Auto-scrolling to load all hidden listings... Please wait!');
+  try {
+    const res = await window.tfdApi.scroll();
+    if (res.success) {
+      setStatus('idle', 'Auto-Scroll complete. Ready to extract.');
+      showToast('✅ Auto-Scroll complete! Click Extract Data now.');
+    } else {
+      showToast('⚠️ Could not scroll. Is the browser open?');
+      setStatus('error', 'Scroll failed');
+    }
+  } catch (err) {
+    showToast('Failed to auto-scroll');
+    setStatus('error', 'Error auto-scrolling');
   }
 }
 
@@ -266,8 +285,8 @@ async function extractData() {
     return;
   }
 
-  setStatus('scraping', 'Auto-Scrolling and Extracting data...');
-  showToast('🔄 Auto-scrolling to load all hidden listings... Please wait!');
+  setStatus('scraping', 'Extracting data from browser...');
+  showToast('⚡ Extracting loaded listings...');
   try {
     // This executes parser.js in the open window
     const result = await window.tfdApi.scrape(selectedMod, platformSelect.value);

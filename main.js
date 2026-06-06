@@ -110,30 +110,7 @@ function registerIPC() {
       // Since parser.js is written as a module, we just read it and append a call to it.
       const injectCode = `
         ${parserCode.replace('module.exports = { parseMarketPage };', '')}
-        
-        (async function autoScrollAndParse() {
-          return new Promise((resolve) => {
-            let lastHeight = 0;
-            let unchangedCount = 0;
-            
-            const timer = setInterval(() => {
-              window.scrollTo(0, document.body.scrollHeight);
-              let currentHeight = document.body.scrollHeight;
-              
-              if (currentHeight === lastHeight) {
-                unchangedCount++;
-                // Stop if height hasn't changed for ~1.5s
-                if (unchangedCount >= 3) {
-                  clearInterval(timer);
-                  resolve(parseMarketPage());
-                }
-              } else {
-                lastHeight = currentHeight;
-                unchangedCount = 0;
-              }
-            }, 500);
-          });
-        })();
+        parseMarketPage();
       `;
 
       const modules = await marketWindow.webContents.executeJavaScript(injectCode);
@@ -145,6 +122,46 @@ function registerIPC() {
         return { success: true, count, status: 'extracted' };
       }
       return { success: true, count: 0, status: 'extracted' };
+    } catch (err) {
+      console.error(err);
+      return { success: false, error: err.message };
+    }
+  });
+
+  ipcMain.handle('scrape:scroll', async () => {
+    try {
+      if (!marketWindow || marketWindow.isDestroyed()) {
+        return { success: false, error: 'Browser not open' };
+      }
+
+      const scrollCode = `
+        (async function autoScroll() {
+          return new Promise((resolve) => {
+            let lastHeight = 0;
+            let unchangedCount = 0;
+            
+            const timer = setInterval(() => {
+              window.scrollTo(0, document.body.scrollHeight);
+              let currentHeight = document.body.scrollHeight;
+              
+              if (currentHeight === lastHeight) {
+                unchangedCount++;
+                // Stop if height hasn't changed for ~2.5s (5 ticks) to give lazy loading more time
+                if (unchangedCount >= 5) {
+                  clearInterval(timer);
+                  resolve(true);
+                }
+              } else {
+                lastHeight = currentHeight;
+                unchangedCount = 0;
+              }
+            }, 500);
+          });
+        })();
+      `;
+
+      await marketWindow.webContents.executeJavaScript(scrollCode);
+      return { success: true };
     } catch (err) {
       console.error(err);
       return { success: false, error: err.message };
