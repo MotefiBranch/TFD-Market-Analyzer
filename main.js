@@ -220,6 +220,10 @@ function registerIPC() {
     return allMods.filter(m => m.toLowerCase().includes(q)).slice(0, 50);
   });
 
+  ipcMain.handle('analysis:all-mods', () => {
+    return marketDB.getModNames();
+  });
+
   ipcMain.handle('analysis:stats', (_e, modName) => {
     return marketDB.getStatsForMod(modName);
   });

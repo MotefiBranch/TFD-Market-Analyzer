@@ -344,7 +344,8 @@ function initActions() {
     }
   });
 
-  $('refresh-favorites-btn')?.addEventListener('click', startInteractiveRefresh);
+  $('refresh-favorites-btn')?.addEventListener('click', () => startInteractiveRefresh('favorites'));
+  $('refresh-all-btn')?.addEventListener('click', () => startInteractiveRefresh('all'));
 }
 
 async function runAnalysis() {
@@ -481,15 +482,30 @@ function showRefreshModal(modName) {
   });
 }
 
-async function startInteractiveRefresh() {
-  if (!appSettings.favorites || appSettings.favorites.length === 0) {
-    showToast('Your Favorites list is empty.');
-    return;
+async function startInteractiveRefresh(listType = 'favorites') {
+  let listToRefresh = [];
+
+  if (listType === 'favorites') {
+    listToRefresh = appSettings.favorites || [];
+    if (listToRefresh.length === 0) {
+      showToast('Your Favorites list is empty.');
+      return;
+    }
+  } else if (listType === 'all') {
+    // Show disclaimer for "All"
+    const confirmAll = confirm("WARNING: This will loop through every single item in the database, requiring manual confirmation for each one. This could take a long time.\n\nDo you want to proceed?");
+    if (!confirmAll) return;
+    
+    listToRefresh = await window.tfdApi.getAllMods() || [];
+    if (listToRefresh.length === 0) {
+      showToast('Database is empty. Scrape some mods first!');
+      return;
+    }
   }
 
   abortRefreshLoop = false;
   
-  for (const mod of appSettings.favorites) {
+  for (const mod of listToRefresh) {
     if (abortRefreshLoop) break;
     
     // Auto-select the mod in the UI so the user sees what's happening
@@ -509,12 +525,12 @@ async function startInteractiveRefresh() {
       setStatus('scraping', `Searching for ${mod}...`);
       const navRes = await window.tfdApi.scrapeNavigate(mod);
       if (!navRes.success) {
-        showToast(`Could not navigate to ${mod}. Opening browser, please manually search and hit Auto-Scroll.`);
+        // Fallback: Copy to clipboard and open browser
+        await navigator.clipboard.writeText(mod).catch(e => console.error('Clipboard failed', e));
+        showToast(`Could not inject search. '${mod}' copied to clipboard! Please paste it into the search bar manually.`);
         await openMarketBrowser();
         // Pause to let the user manually search if injection failed.
         // We do NOT auto-extract if nav fails because we don't know when they're done.
-        // They will have to click extract themselves, and the loop will pause.
-        // Actually, let's just abort this iteration.
         continue;
       }
       
