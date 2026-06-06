@@ -50,7 +50,7 @@ npm run build:win
 
 ## Credits & Acknowledgements
 
-The "Auto-Scroll & Extract" workflow in this application was heavily inspired by the incredible open-source [tfd-market-helper](https://github.com/syphari/tfd-market-helper) Chrome Extension created by Syphari. We highly recommend checking out their extension if you prefer a browser-native scraping solution! They also have an Electron Application but just without the graphs and medians
+The "Auto-Scroll & Extract" workflow in this application was heavily inspired by the incredible open-source [tfd-market-helper](https://github.com/syphari/tfd-market-helper) Chrome Extension created by Syphari. We highly recommend checking out their extension if you prefer a browser-native scraping solution! They also have an Electron Application but just without the graphs and medians. Also The Ai coding tools that made this possible (i.e, this is built on vibes 😎)
 
 ## License
 MIT License
