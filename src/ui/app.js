@@ -559,6 +559,7 @@ function renderListings(listings) {
             ${l.seller_rank || l.sellerRank ? ` · MR ${escapeHtml(l.seller_rank || l.sellerRank)}` : ''}
             ${l.reroll_count !== undefined && l.reroll_count > 0 ? ` · Rerolls <strong style="color:var(--text-primary);">${l.reroll_count}</strong>` : ''}
             ${l.required_rank ? ` · Req MR ${escapeHtml(l.required_rank)}` : ''}
+            ${l.socket_type ? `<img src="assets/sockets/${escapeHtml(l.socket_type.toLowerCase())}.png" alt="${escapeHtml(l.socket_type)}" title="${escapeHtml(l.socket_type)}" style="width:14px; height:14px; vertical-align:middle; margin-left:4px; opacity: 0.8;">` : ''}
           </span>
         </div>
         <div class="listing-card__stats">
