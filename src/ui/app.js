@@ -192,7 +192,8 @@ function addStatRow() {
   row.innerHTML = `
     <button class="stat-sign positive" title="Toggle positive/negative">+</button>
     <input type="text" placeholder="Stat name..." class="stat-name-input" style="flex:1;">
-    <input type="text" placeholder="Value" class="stat-value-input" style="width:70px;text-align:center;">
+    <input type="text" placeholder="Current" class="stat-value-input" style="width:55px;text-align:center;">
+    <input type="text" placeholder="Max" class="stat-value-max-input" style="width:55px;text-align:center;">
     <button class="remove-stat" title="Remove">✕</button>
   `;
 
@@ -229,9 +230,10 @@ function getTargetStats() {
   rows.forEach(row => {
     const name = row.querySelector('.stat-name-input')?.value?.trim();
     const value = row.querySelector('.stat-value-input')?.value?.trim();
+    const maxValue = row.querySelector('.stat-value-max-input')?.value?.trim();
     const isPositive = row.querySelector('.stat-sign')?.classList.contains('positive');
     if (name) {
-      stats.push({ name, value: value || '', positive: isPositive });
+      stats.push({ name, value: value || '', maxValue: maxValue || '', positive: isPositive });
     }
   });
   return stats;

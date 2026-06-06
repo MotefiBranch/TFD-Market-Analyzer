@@ -20,15 +20,20 @@ class StatMatcher {
 
     const normalizedTarget = targetStats.map(s => ({
       name: this._normalize(s.name),
-      value: this._parseValue(s.value),
+      value: this._parseValue(s.value)[0] || null,
+      maxValue: this._parseValue(s.maxValue)[0] || null,
       positive: s.positive !== false
     }));
 
-    const normalizedListing = listingStats.map(s => ({
-      name: this._normalize(s.statName || s.stat_name || ''),
-      value: this._parseValue(s.statValue || s.stat_value || s.value || ''),
-      positive: s.isPositive || s.is_positive
-    }));
+    const normalizedListing = listingStats.map(s => {
+      const nums = this._parseValue(s.statValue || s.stat_value || s.value || '');
+      return {
+        name: this._normalize(s.statName || s.stat_name || ''),
+        value: nums[0] !== undefined ? nums[0] : null,
+        maxValue: nums.length > 1 ? nums[1] : null,
+        positive: s.isPositive || s.is_positive
+      };
+    });
 
     const matchedStats = [];
     const missingStats = [];
@@ -48,6 +53,7 @@ class StatMatcher {
           targetValue: target.value,
           matchedName: match.stat.name,
           matchedValue: match.stat.value,
+          matchedMaxValue: match.stat.maxValue,
           nameScore,
           valueScore,
           combinedScore
@@ -115,7 +121,7 @@ class StatMatcher {
       const nameScore = this._nameMatchScore(target.name, stat.name);
       if (nameScore < 50) continue; // Too different
 
-      const valueScore = this._valueMatchScore(target.value, stat.value);
+      const valueScore = this._valueMatchScore(target, stat);
       const combined = (nameScore * 0.6) + (valueScore * 0.4);
 
       if (combined > bestScore) {
@@ -143,18 +149,38 @@ class StatMatcher {
     return Math.round((intersection.length / union.size) * 100);
   }
 
-  static _valueMatchScore(targetVal, listingVal) {
-    if (targetVal === null || listingVal === null) return 50; // Unknown values get neutral score
-    if (targetVal === listingVal) return 100;
+  static _valueMatchScore(target, stat) {
+    if (target.value === null && target.maxValue === null) return 100; // User didn't specify values
+    if (stat.value === null && stat.maxValue === null) return 50;
 
-    // If both are numbers, compute proximity
-    if (!isNaN(targetVal) && !isNaN(listingVal)) {
-      const maxVal = Math.max(Math.abs(targetVal), Math.abs(listingVal), 1);
-      const diff = Math.abs(targetVal - listingVal);
-      return Math.round(Math.max(0, (1 - diff / maxVal) * 100));
+    let scores = [];
+    if (target.value !== null) {
+      if (stat.value !== null) {
+        scores.push(this._computeProximity(target.value, stat.value));
+      } else {
+        scores.push(0);
+      }
     }
 
-    return 0;
+    if (target.maxValue !== null) {
+      // If stat only has one value (e.g., standard module), compare against that. If it has two (reactor), compare against max.
+      const compareStat = stat.maxValue !== null ? stat.maxValue : stat.value;
+      if (compareStat !== null) {
+        scores.push(this._computeProximity(target.maxValue, compareStat));
+      } else {
+        scores.push(0);
+      }
+    }
+
+    if (scores.length === 0) return 0;
+    return Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
+  }
+
+  static _computeProximity(t, s) {
+    if (t === s) return 100;
+    const maxVal = Math.max(Math.abs(t), Math.abs(s), 1);
+    const diff = Math.abs(t - s);
+    return Math.round(Math.max(0, (1 - diff / maxVal) * 100));
   }
 
   static _normalize(str) {
@@ -162,9 +188,15 @@ class StatMatcher {
   }
 
   static _parseValue(val) {
-    if (val === null || val === undefined || val === '') return null;
-    const num = parseFloat(String(val).replace(/[^0-9.\-]/g, ''));
-    return isNaN(num) ? null : num;
+    if (val === null || val === undefined || val === '') return [];
+    // Stat values can be like "36.7%[+] 46.7%[+]", so we split by space and parse all numbers
+    const parts = String(val).split(/\s+/);
+    const nums = parts.map(p => {
+      const num = parseFloat(p.replace(/[^0-9.\-]/g, ''));
+      return isNaN(num) ? null : num;
+    }).filter(n => n !== null);
+    
+    return nums;
   }
 }
 
