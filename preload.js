@@ -9,6 +9,7 @@ contextBridge.exposeInMainWorld('tfdApi', {
   // ── Scraper ──
   scrape: (modName, platform) => ipcRenderer.invoke('scrape:run', modName, platform),
   scroll: () => ipcRenderer.invoke('scrape:scroll'),
+  scrapeNavigate: (modName) => ipcRenderer.invoke('scrape:navigate', modName),
   getScrapeStatus: () => ipcRenderer.invoke('scrape:status'),
   abortScrape: () => ipcRenderer.invoke('scrape:abort'),
 

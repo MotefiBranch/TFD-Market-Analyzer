@@ -108,6 +108,20 @@
           <button class="btn btn--secondary btn--full btn--sm" id="scroll-btn">⏬ Auto-Scroll</button>
           <button class="btn btn--add btn--full btn--sm" id="extract-btn">⬇️ Extract Data</button>
           <button class="btn btn--secondary btn--full btn--sm mt-8" id="save-tracked-btn">💾 Save to Favorites</button>
+          <button class="btn btn--secondary btn--full btn--sm" id="refresh-favorites-btn" style="border-color:var(--accent-amber);color:var(--accent-amber);">🔄 Refresh Favorites</button>
+        </div>
+      </div>
+
+      <!-- Refresh Modal -->
+      <div id="refresh-modal" class="hidden" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:9999;display:none;justify-content:center;align-items:center;">
+        <div style="background:var(--bg-elevated);border:1px solid var(--glass-border);border-radius:8px;padding:20px;width:300px;text-align:center;">
+          <h3 style="margin:0 0 10px 0;color:var(--text-primary);">Manual Refresh</h3>
+          <p style="font-size:13px;color:var(--text-secondary);margin-bottom:20px;">Do you want to refresh <br><strong id="refresh-mod-name" style="color:var(--accent-amber);"></strong>?</p>
+          <div style="display:flex;gap:10px;justify-content:center;">
+            <button id="refresh-btn-yes" class="btn btn--primary btn--sm" style="flex:1;">Yes</button>
+            <button id="refresh-btn-no" class="btn btn--secondary btn--sm" style="flex:1;">No</button>
+          </div>
+          <button id="refresh-btn-abort" class="btn btn--secondary btn--sm mt-8" style="width:100%;color:var(--text-danger);border-color:var(--text-danger);">Abort Loop</button>
         </div>
       </div>
 

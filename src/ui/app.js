@@ -343,6 +343,8 @@ function initActions() {
       showToast('Already in favorites!');
     }
   });
+
+  $('refresh-favorites-btn')?.addEventListener('click', startInteractiveRefresh);
 }
 
 async function runAnalysis() {
@@ -448,6 +450,86 @@ async function extractData() {
   } catch (err) {
     setStatus('error', 'Extraction error');
     showToast('❌ ' + err.message);
+  }
+}
+
+// ── Interactive Refresh Loop ──
+let abortRefreshLoop = false;
+
+function showRefreshModal(modName) {
+  return new Promise((resolve) => {
+    const modal = $('refresh-modal');
+    $('refresh-mod-name').textContent = modName;
+    modal.style.display = 'flex';
+    modal.classList.remove('hidden');
+
+    const handleYes = () => { cleanup(); resolve('yes'); };
+    const handleNo = () => { cleanup(); resolve('no'); };
+    const handleAbort = () => { cleanup(); resolve('abort'); };
+
+    $('refresh-btn-yes').addEventListener('click', handleYes);
+    $('refresh-btn-no').addEventListener('click', handleNo);
+    $('refresh-btn-abort').addEventListener('click', handleAbort);
+
+    function cleanup() {
+      modal.style.display = 'none';
+      modal.classList.add('hidden');
+      $('refresh-btn-yes').removeEventListener('click', handleYes);
+      $('refresh-btn-no').removeEventListener('click', handleNo);
+      $('refresh-btn-abort').removeEventListener('click', handleAbort);
+    }
+  });
+}
+
+async function startInteractiveRefresh() {
+  if (!appSettings.favorites || appSettings.favorites.length === 0) {
+    showToast('Your Favorites list is empty.');
+    return;
+  }
+
+  abortRefreshLoop = false;
+  
+  for (const mod of appSettings.favorites) {
+    if (abortRefreshLoop) break;
+    
+    // Auto-select the mod in the UI so the user sees what's happening
+    await selectMod(mod);
+
+    // Prompt user
+    const choice = await showRefreshModal(mod);
+
+    if (choice === 'abort') {
+      showToast('Loop aborted.');
+      abortRefreshLoop = true;
+      break;
+    }
+    
+    if (choice === 'yes') {
+      // Step 1: Tell backend to navigate/search
+      setStatus('scraping', `Searching for ${mod}...`);
+      const navRes = await window.tfdApi.scrapeNavigate(mod);
+      if (!navRes.success) {
+        showToast(`Could not navigate to ${mod}. Opening browser, please manually search and hit Auto-Scroll.`);
+        await openMarketBrowser();
+        // Pause to let the user manually search if injection failed.
+        // We do NOT auto-extract if nav fails because we don't know when they're done.
+        // They will have to click extract themselves, and the loop will pause.
+        // Actually, let's just abort this iteration.
+        continue;
+      }
+      
+      // Step 2: Auto-Scroll
+      await autoScrollBrowser();
+      await new Promise(r => setTimeout(r, 1000)); // Wait a second for it to settle
+
+      // Step 3: Extract
+      await extractData();
+      await new Promise(r => setTimeout(r, 1000)); // Small delay before next prompt
+    }
+  }
+  
+  if (!abortRefreshLoop) {
+    showToast('✅ Finished interactive refresh loop!');
   }
 }
 

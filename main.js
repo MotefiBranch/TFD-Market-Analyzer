@@ -129,6 +129,46 @@ function registerIPC() {
     }
   });
 
+  ipcMain.handle('scrape:navigate', async (_e, modName) => {
+    try {
+      if (!marketWindow || marketWindow.isDestroyed()) {
+        return { success: false, error: 'Browser not open' };
+      }
+      
+      const navCode = `
+        return new Promise(resolve => {
+          const inputs = Array.from(document.querySelectorAll('input'));
+          // Find an input that likely acts as a search box
+          const searchInput = inputs.find(i => i.placeholder && i.placeholder.toLowerCase().includes('search')) || inputs[0];
+          if (searchInput) {
+            searchInput.value = "${modName.replace(/"/g, '\\"')}";
+            searchInput.dispatchEvent(new Event('input', { bubbles: true }));
+            searchInput.dispatchEvent(new Event('change', { bubbles: true }));
+            
+            // Try to trigger the search (Enter key)
+            searchInput.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', keyCode: 13, bubbles: true }));
+            searchInput.dispatchEvent(new KeyboardEvent('keyup', { key: 'Enter', keyCode: 13, bubbles: true }));
+            
+            // Alternatively try finding a search button
+            const btns = Array.from(document.querySelectorAll('button'));
+            const searchBtn = btns.find(b => b.textContent.toLowerCase().includes('search') || b.className.toLowerCase().includes('search'));
+            if (searchBtn) searchBtn.click();
+            
+            resolve(true);
+          } else {
+            resolve(false);
+          }
+        });
+      `;
+      
+      const res = await marketWindow.webContents.executeJavaScript(navCode);
+      return { success: res };
+    } catch (err) {
+      console.error('Navigate error:', err);
+      return { success: false, error: err.message };
+    }
+  });
+
   ipcMain.handle('scrape:scroll', async () => {
     try {
       if (!marketWindow || marketWindow.isDestroyed()) {
