@@ -559,7 +559,20 @@ function renderListings(listings) {
             let cls = s.isPositive ? 'positive' : s.isNegative ? 'negative' : 'neutral';
             
             if (cls === 'neutral') {
-              cls = 'positive';
+              const rawValue = String(s.statValue || '');
+              const statName = (s.statName || '').toLowerCase();
+              
+              // Only consider the actual value part, not dashes in the name
+              const isNegativeMath = rawValue.startsWith('-');
+              const isInverseStat = statName.includes('cooldown') || statName.includes('cost');
+
+              if (isNegativeMath && !isInverseStat) {
+                cls = 'negative'; // Decreased Power/Damage (Bad)
+              } else if (!isNegativeMath && isInverseStat && rawValue.match(/[0-9]/)) {
+                cls = 'negative'; // Increased Cooldown/Cost (Bad)
+              } else {
+                cls = 'positive'; // Normal buff (Good)
+              }
             }
 
             const cleanValue = String(s.statValue || '').replace(/\[\+\]|\[\-\]/g, '').trim();
