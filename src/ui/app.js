@@ -33,6 +33,33 @@ const scrapeOverlay = $('scrape-overlay');
 const scrapeStatusText = $('scrape-status-text');
 const platformSelect = $('platform-select');
 
+// ── Constants ──
+const CHARACTER_GOD_ROLLS = {
+  "Bunny": ["Electric Skill Power Boost Ratio", "Singular Skill Power Boost Ratio"],
+  "Ultimate Bunny": ["Electric Skill Power Boost Ratio", "Singular Skill Power Boost Ratio"],
+  "Gley": ["Non-Attribute Skill Power Boost Ratio", "Dimension Skill Power Boost Ratio"],
+  "Ultimate Gley": ["Non-Attribute Skill Power Boost Ratio", "Dimension Skill Power Boost Ratio"],
+  "Valby": ["Non-Attribute Skill Power Boost Ratio", "Dimension Skill Power Boost Ratio"],
+  "Ultimate Valby": ["Non-Attribute Skill Power Boost Ratio", "Dimension Skill Power Boost Ratio"],
+  "Ajax": ["Non-Attribute Skill Power Boost Ratio", "Tech Skill Power Boost Ratio"],
+  "Ultimate Ajax": ["Non-Attribute Skill Power Boost Ratio", "Tech Skill Power Boost Ratio"],
+  "Viessa": ["Chill Skill Power Boost Ratio", "Tech Skill Power Boost Ratio"],
+  "Ultimate Viessa": ["Chill Skill Power Boost Ratio", "Tech Skill Power Boost Ratio"],
+  "Lepic": ["Fire Skill Power Boost Ratio", "Tech Skill Power Boost Ratio"],
+  "Ultimate Lepic": ["Fire Skill Power Boost Ratio", "Tech Skill Power Boost Ratio"],
+  "Freyna": ["Toxic Skill Power Boost Ratio", "Tech Skill Power Boost Ratio"],
+  "Ultimate Freyna": ["Toxic Skill Power Boost Ratio", "Tech Skill Power Boost Ratio"],
+  "Yujin": ["Non-Attribute Skill Power Boost Ratio", "Fusion Skill Power Boost Ratio"],
+  "Enzo": ["Non-Attribute Skill Power Boost Ratio", "Dimension Skill Power Boost Ratio"],
+  "Luna": ["Non-Attribute Skill Power Boost Ratio", "Tech Skill Power Boost Ratio"],
+  "Sharen": ["Electric Skill Power Boost Ratio", "Fusion Skill Power Boost Ratio"],
+  "Blair": ["Fire Skill Power Boost Ratio", "Dimension Skill Power Boost Ratio"],
+  "Jayber": ["Non-Attribute Skill Power Boost Ratio", "Dimension Skill Power Boost Ratio"],
+  "Kyle": ["Non-Attribute Skill Power Boost Ratio", "Dimension Skill Power Boost Ratio"],
+  "Esiemo": ["Fire Skill Power Boost Ratio", "Tech Skill Power Boost Ratio"],
+  "Hailey": ["Chill Skill Power Boost Ratio", "Singular Skill Power Boost Ratio"]
+};
+
 // ── Initialization ──
 let appSettings = { platform: 'PC', favorites: [] };
 
@@ -40,6 +67,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   initWindowControls();
   initSearch();
   initStatBuilder();
+  initCharacterOptimizer();
   initTabs();
   initActions();
   
@@ -251,6 +279,48 @@ function initTabs() {
   });
 }
 
+// ── Character Optimizer ──
+function initCharacterOptimizer() {
+  const charInput = $('target-character-input');
+  const promptBox = $('character-optimizer-prompt');
+  const statsDiv = $('character-suggested-stats');
+  const btnApply = $('btn-apply-suggested');
+  const btnFilter = $('btn-just-filter');
+
+  charInput.addEventListener('change', () => {
+    const val = charInput.value.trim();
+    if (CHARACTER_GOD_ROLLS[val]) {
+      promptBox.classList.remove('hidden');
+      statsDiv.innerHTML = CHARACTER_GOD_ROLLS[val].join('<br>+ ');
+      statsDiv.innerHTML = '+ ' + statsDiv.innerHTML;
+    } else {
+      promptBox.classList.add('hidden');
+    }
+  });
+
+  btnApply.addEventListener('click', () => {
+    const val = charInput.value.trim();
+    if (!CHARACTER_GOD_ROLLS[val]) return;
+    
+    // Clear existing stats
+    statRows.innerHTML = '';
+    
+    // Add new stats
+    CHARACTER_GOD_ROLLS[val].forEach(stat => {
+      addStatRow();
+      const rows = statRows.querySelectorAll('.stat-row');
+      const lastRow = rows[rows.length - 1];
+      lastRow.querySelector('.stat-name-input').value = stat;
+    });
+    
+    runAnalysis();
+  });
+
+  btnFilter.addEventListener('click', () => {
+    runAnalysis();
+  });
+}
+
 // ── Actions ──
 function initActions() {
   analyzeBtn.addEventListener('click', runAnalysis);
@@ -288,12 +358,13 @@ async function runAnalysis() {
   const stats = getTargetStats();
   const platform = platformSelect.value;
   const targetSocket = $('target-socket-input')?.value?.trim() || null;
+  const targetCharacter = $('target-character-input')?.value?.trim() || null;
 
   analyzeBtn.disabled = true;
   analyzeBtn.textContent = '⏳ Analyzing...';
 
   try {
-    const result = await window.tfdApi.analyze(selectedMod, stats, platform, 30, targetSocket);
+    const result = await window.tfdApi.analyze(selectedMod, stats, platform, 30, targetSocket, targetCharacter);
     currentAnalysis = result;
 
     emptyState.classList.add('hidden');

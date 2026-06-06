@@ -39,6 +39,47 @@
         </div>
       </div>
 
+      <!-- Character Optimizer Section -->
+      <div class="sidebar__section">
+        <div class="sidebar__title"><span class="dot" style="background:var(--accent-amber);box-shadow:0 0 6px rgba(245,158,11,0.4);"></span> Character Optimizer</div>
+        <div style="margin-bottom: 8px;">
+          <input list="character-list" id="target-character-input" class="search-input" placeholder="Select a Descendant..." style="width:100%; padding:6px 10px; font-size:12px;">
+          <datalist id="character-list">
+             <option value="Bunny">
+             <option value="Ultimate Bunny">
+             <option value="Gley">
+             <option value="Ultimate Gley">
+             <option value="Valby">
+             <option value="Ultimate Valby">
+             <option value="Ajax">
+             <option value="Ultimate Ajax">
+             <option value="Viessa">
+             <option value="Ultimate Viessa">
+             <option value="Lepic">
+             <option value="Ultimate Lepic">
+             <option value="Freyna">
+             <option value="Ultimate Freyna">
+             <option value="Yujin">
+             <option value="Enzo">
+             <option value="Luna">
+             <option value="Sharen">
+             <option value="Blair">
+             <option value="Jayber">
+             <option value="Kyle">
+             <option value="Esiemo">
+             <option value="Hailey">
+          </datalist>
+        </div>
+        <div id="character-optimizer-prompt" class="hidden" style="background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.2); border-radius:6px; padding:10px; font-size:12px;">
+          <div style="color:var(--text-secondary); margin-bottom:8px;">Suggested God Roll:</div>
+          <div id="character-suggested-stats" style="font-weight:700; color:var(--accent-amber); margin-bottom:10px; line-height:1.4;"></div>
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            <button class="btn btn--sm" id="btn-apply-suggested" style="background:var(--accent-amber-dim); color:var(--accent-amber); border:1px solid rgba(245,158,11,0.3);">Apply Stats & Analyze</button>
+            <button class="btn btn--sm" id="btn-just-filter" style="background:var(--glass-bg); border:1px solid var(--glass-border); color:var(--text-secondary);">Just Filter Listings</button>
+          </div>
+        </div>
+      </div>
+
       <!-- Target Lookup Section -->
       <div class="sidebar__section">
         <div class="sidebar__title"><span class="dot" style="background:var(--accent-purple);box-shadow:0 0 6px rgba(139,92,246,0.4);"></span> Target Lookup</div>

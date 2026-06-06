@@ -184,7 +184,7 @@ function registerIPC() {
     return marketDB.getStatsForMod(modName);
   });
 
-  ipcMain.handle('analysis:analyze', (_e, modName, targetStats, platform, days, targetSocket) => {
+  ipcMain.handle('analysis:analyze', (_e, modName, targetStats, platform, days, targetSocket, targetCharacter) => {
     const p = platform || settings.platform;
     const d = days || 30;
 
@@ -194,6 +194,14 @@ function registerIPC() {
     if (targetSocket) {
       const ts = targetSocket.toLowerCase();
       listings = listings.filter(l => l.socket_type && l.socket_type.toLowerCase().includes(ts));
+    }
+
+    if (targetCharacter) {
+      const tc = targetCharacter.toLowerCase();
+      listings = listings.filter(l => {
+        if (!l.available_characters || !Array.isArray(l.available_characters)) return false;
+        return l.available_characters.some(char => char.name && char.name.toLowerCase().includes(tc));
+      });
     }
 
     // Rank by stat match
