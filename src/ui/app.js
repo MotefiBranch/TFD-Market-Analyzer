@@ -389,8 +389,19 @@ function renderSummary(summary) {
 
   const trendIcons = { rising: '📈', falling: '📉', stable: '➡️' };
   $('card-trend').textContent = trendIcons[summary.trend] || '➡️';
-  $('card-listings').textContent = `${summary.listingCount} listings`;
-  $('card-listings').className = 'summary-card__change stable';
+
+  if (summary.isEstimate) {
+    $('card-listings').textContent = `0 Live (Estimated)`;
+    $('card-listings').className = 'summary-card__change down';
+    $('card-median').parentElement.querySelector('.summary-card__label').textContent = 'ESTIMATED PRICE';
+    
+    // Additional tooltip/hint in the listings count header
+    $('listings-count').textContent = '0 live results (Showing ML Estimate)';
+  } else {
+    $('card-listings').textContent = `${summary.listingCount} listings`;
+    $('card-listings').className = 'summary-card__change stable';
+    $('card-median').parentElement.querySelector('.summary-card__label').textContent = 'MEDIAN PRICE';
+  }
 }
 
 function renderChange(el, value, label) {
@@ -517,7 +528,11 @@ function renderChart(chartData) {
 
 function renderListings(listings) {
   if (!listings || listings.length === 0) {
-    listingsGrid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted);">No matching listings found</div>';
+    if (currentAnalysis && currentAnalysis.summary && currentAnalysis.summary.isEstimate) {
+      listingsGrid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted);"><h4 style="margin-bottom:8px;color:var(--text-bright);">0 Exact Matches</h4><p>We generated an estimated True Market Value based on historical stat premiums across the game economy.</p></div>';
+    } else {
+      listingsGrid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted);">No matching listings found</div>';
+    }
     listingsCount.textContent = '0 results';
     return;
   }
@@ -542,7 +557,8 @@ function renderListings(listings) {
         <div class="listing-card__stats">
           ${stats.map(s => {
             const cls = s.isPositive ? 'positive' : s.isNegative ? 'negative' : 'neutral';
-            return `<span class="stat-chip ${cls}">${escapeHtml(s.statName || '')} ${escapeHtml(s.statValue || '')}</span>`;
+            const cleanValue = String(s.statValue || '').replace(/\[\+\]|\[\-\]/g, '').trim();
+            return `<span class="stat-chip ${cls}">${escapeHtml(s.statName || '')} ${escapeHtml(cleanValue)}</span>`;
           }).join('')}
         </div>
       </div>

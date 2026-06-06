@@ -254,6 +254,80 @@ class MarketDB {
     return this._all(query, params);
   }
 
+  // ── Predictive Estimator Operations ──
+
+  getModuleBasePrice(modName, platform = null) {
+    let query = 'SELECT price FROM listings WHERE mod_name = ?';
+    const params = [modName];
+
+    if (platform && platform !== 'ALL') {
+      if (platform === 'PC') query += " AND platform IN ('PC', 'Steam', 'STEAM', 'All-Platform')";
+      else if (platform === 'PS') query += " AND platform IN ('PS', 'PlayStation', 'All-Platform')";
+      else if (platform === 'XBOX') query += " AND platform IN ('XBOX', 'Xbox', 'All-Platform')";
+      else {
+        query += ' AND platform = ?';
+        params.push(platform);
+      }
+    }
+
+    const prices = this._all(query, params).map(r => r.price).sort((a, b) => a - b);
+    return this._median(prices);
+  }
+
+  getStatGlobalPremium(statName, platform = null) {
+    let platQuery = '';
+    const paramsPlat = [];
+    if (platform && platform !== 'ALL') {
+      if (platform === 'PC') platQuery = " AND l.platform IN ('PC', 'Steam', 'STEAM', 'All-Platform')";
+      else if (platform === 'PS') platQuery = " AND l.platform IN ('PS', 'PlayStation', 'All-Platform')";
+      else if (platform === 'XBOX') platQuery = " AND l.platform IN ('XBOX', 'Xbox', 'All-Platform')";
+      else {
+        platQuery = ' AND l.platform = ?';
+        paramsPlat.push(platform);
+      }
+    }
+
+    // Get all module names that have this stat
+    const modsWithStat = this._all(`
+      SELECT DISTINCT l.mod_name 
+      FROM listings l
+      JOIN listing_stats ls ON l.id = ls.listing_id
+      WHERE ls.stat_name = ? ${platQuery}
+    `, [statName, ...paramsPlat]).map(r => r.mod_name);
+
+    if (modsWithStat.length === 0) return 0;
+
+    let totalPremium = 0;
+    let count = 0;
+
+    for (const mod of modsWithStat) {
+      const queryWith = `
+        SELECT l.price FROM listings l
+        JOIN listing_stats ls ON l.id = ls.listing_id
+        WHERE l.mod_name = ? AND ls.stat_name = ? ${platQuery}
+      `;
+      const pricesWith = this._all(queryWith, [mod, statName, ...paramsPlat]).map(r => r.price).sort((a, b) => a - b);
+      const medianWith = this._median(pricesWith);
+
+      const queryWithout = `
+        SELECT l.price FROM listings l
+        WHERE l.mod_name = ? AND l.id NOT IN (
+          SELECT listing_id FROM listing_stats WHERE stat_name = ?
+        ) ${platQuery}
+      `;
+      const pricesWithout = this._all(queryWithout, [mod, statName, ...paramsPlat]).map(r => r.price).sort((a, b) => a - b);
+      const medianWithout = this._median(pricesWithout);
+
+      if (medianWithout > 0 && medianWith > 0) {
+        const premium = (medianWith - medianWithout) / medianWithout;
+        totalPremium += premium;
+        count++;
+      }
+    }
+
+    return count > 0 ? (totalPremium / count) : 0;
+  }
+
   // ── Tracked Mods ──
 
   saveTrackedMod(modName, stats, platform = 'PC') {

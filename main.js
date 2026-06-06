@@ -11,6 +11,7 @@ const { MarketDB } = require('./src/database/queries');
 const { PricingCalculator } = require('./src/analysis/pricing');
 const { StatMatcher } = require('./src/analysis/matcher');
 const { TrendComputer } = require('./src/analysis/trends');
+const { Estimator } = require('./src/analysis/estimator');
 const fs = require('fs');
 
 let mainWindow = null;
@@ -200,7 +201,12 @@ function registerIPC() {
     const chartData = TrendComputer.buildChartData(history);
 
     // Compute summary
-    const summary = PricingCalculator.computeSummary(history);
+    let summary;
+    if (history.length === 0 && ranked.length === 0 && targetStats && targetStats.length > 0) {
+      summary = Estimator.estimatePrice(marketDB, modName, targetStats, p);
+    } else {
+      summary = PricingCalculator.computeSummary(history);
+    }
 
     // Get today's data
     const todayPrices = marketDB.getTodayPrices(modName, p);
