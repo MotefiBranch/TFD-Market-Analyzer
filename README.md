@@ -15,10 +15,16 @@ https://github.com/user-attachments/assets/f3192ab3-cb39-49f1-95b9-ff1ade6f0a33
 
 - **True Weighted Statistics**: Most price aggregators simply take the average of all unique price points. The TFD Market Analyzer weights prices by listing volume, ensuring that 200 listings at 20 Caliber carry vastly more mathematical weight than 1 listing at 2,000 Caliber.
 - **Predictive Pricing Estimator**: When searching for highly specific or rare stat combinations (e.g., "HP Heal" + "Skill Cooldown") that currently have zero live listings, the analyzer leverages your historical database to calculate the global premium of those specific stats and intelligently estimates a True Market Value.
+- **Character Optimization & God Rolls**: Search the global database for your specific Descendant, see their community-accepted God Roll stats, and instantly filter the market to find matching, equippable items.
 - **Intelligent Stat Parsing**: Directly reads Nexon's hidden HTML properties to perfectly color-code standard buffs (Green), penalties/debuffs (Red), and multi-tier multiplicative bonuses (`[x]`), eliminating the confusion of the official market's generic text.
-- **Manual "ToS-Safe" Extraction**: To respect Nexon's Terms of Service and anti-bot protections, this tool contains **zero headless automation or background scraping**. You open the built-in Market Browser, navigate the site exactly as you normally would, Make sure to also scroll all the way to the bottom or utilize the auto-scroll feature and click "Extract" to instantly run analytics on whatever is loaded on your screen.
+- **Attended Refresh Macro**: Features an interactive "Refresh Favorites" and "Refresh Database" loop. It prompts you to confirm each item, allowing you to update your tracked modules in minutes while remaining technically "at the keyboard" to evade automated bot detection.
 - **Stat Matcher**: Input your ideal stats and the tool will automatically parse and rank the live listings to find exactly what you are looking for.
 - **Local Persistence**: All historical pricing data is saved securely to a local SQLite database, building a localized historical price trend chart the more you use it.
+
+## ⚠️ Legal Disclaimer
+**This project is for educational purposes only.** It uses an "Attended Macro" approach and web scraping to analyze market data. While designed to require physical user interaction for every action, utilizing third-party tools to interact with, scrape, or automate actions on Nexon's services strictly violates the [Nexon Terms of Service](https://www.nexon.com/en/legal/terms). 
+
+Nexon explicitly forbids the use of "macros," "data mining," or any "robot, spider, site search/retrieval application." Using this tool puts your Nexon account at high risk of suspension or permanent termination. **Use this tool entirely at your own risk.** The developer assumes no responsibility for any account bans or actions taken by Nexon.
 
 ## How to Install & Run
 
