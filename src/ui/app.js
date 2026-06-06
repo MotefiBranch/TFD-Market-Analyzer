@@ -556,6 +556,8 @@ function renderListings(listings) {
           ${escapeHtml(l.seller_name || l.sellerName || 'Unknown')}
           ${l.seller_rank || l.sellerRank ? ` · MR ${escapeHtml(l.seller_rank || l.sellerRank)}` : ''}
           ${l.reroll_count !== undefined && l.reroll_count > 0 ? ` · Rerolls <span style="color:var(--text-primary);font-weight:600;">${l.reroll_count}</span>` : ''}
+          ${l.required_rank ? ` · Req MR ${escapeHtml(l.required_rank)}` : ''}
+          ${l.socket_type ? ` · Socket: ${escapeHtml(l.socket_type)}` : ''}
         </div>
         <div class="listing-card__stats">
           ${stats.map(s => {
