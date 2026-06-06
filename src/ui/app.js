@@ -34,15 +34,65 @@ const scrapeStatusText = $('scrape-status-text');
 const platformSelect = $('platform-select');
 
 // ── Initialization ──
+let appSettings = { platform: 'PC', favorites: [] };
+
 document.addEventListener('DOMContentLoaded', async () => {
   initWindowControls();
   initSearch();
   initStatBuilder();
   initTabs();
   initActions();
+  
+  appSettings = await window.tfdApi.getSettings() || appSettings;
+  if (!appSettings.favorites) appSettings.favorites = [];
+  if (appSettings.platform) platformSelect.value = appSettings.platform;
+  
+  platformSelect.addEventListener('change', async () => {
+    appSettings.platform = platformSelect.value;
+    await window.tfdApi.updateSettings({ platform: appSettings.platform });
+  });
+
+  renderFavorites();
   await updateDbStats();
   initScrapeStatusListener();
 });
+
+// ── Favorites ──
+function renderFavorites() {
+  if (!trackedList) return;
+  trackedList.innerHTML = '';
+  
+  if (!appSettings.favorites || appSettings.favorites.length === 0) {
+    trackedList.innerHTML = '<li style="font-size:12px;color:var(--text-muted);padding:8px 0;">No favorites yet</li>';
+    return;
+  }
+  
+  appSettings.favorites.forEach(mod => {
+    const li = document.createElement('li');
+    li.style.cssText = "display:flex; justify-content:space-between; align-items:center; padding:8px; background:var(--bg-elevated); border:1px solid var(--glass-border); border-radius:6px; margin-bottom:6px; cursor:pointer;";
+    li.innerHTML = `
+      <span style="font-size:13px; color:var(--text-primary); font-weight:500;">${escapeHtml(mod)}</span>
+      <button class="delete-btn" style="background:none; border:none; color:var(--text-danger); cursor:pointer; font-size:14px;">×</button>
+    `;
+    
+    li.addEventListener('click', (e) => {
+      if (e.target.tagName !== 'BUTTON') {
+        selectMod(mod);
+        runAnalysis();
+      }
+    });
+    
+    li.querySelector('.delete-btn').addEventListener('click', async (e) => {
+      e.stopPropagation();
+      appSettings.favorites = appSettings.favorites.filter(m => m !== mod);
+      await window.tfdApi.updateSettings({ favorites: appSettings.favorites });
+      renderFavorites();
+      showToast('Removed from favorites');
+    });
+    
+    trackedList.appendChild(li);
+  });
+}
 
 // ── Window Controls ──
 function initWindowControls() {
@@ -206,6 +256,21 @@ function initActions() {
   $('empty-scrape-btn')?.addEventListener('click', openMarketBrowser);
   $('scroll-btn')?.addEventListener('click', autoScrollBrowser);
   $('extract-btn')?.addEventListener('click', extractData);
+  
+  $('save-tracked-btn')?.addEventListener('click', async () => {
+    if (!selectedMod) {
+      showToast('Please select a mod first!');
+      return;
+    }
+    if (!appSettings.favorites.includes(selectedMod)) {
+      appSettings.favorites.push(selectedMod);
+      await window.tfdApi.updateSettings({ favorites: appSettings.favorites });
+      renderFavorites();
+      showToast(`⭐ Saved ${selectedMod} to Favorites!`);
+    } else {
+      showToast('Already in favorites!');
+    }
+  });
 }
 
 async function runAnalysis() {

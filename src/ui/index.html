@@ -54,10 +54,17 @@
           <button class="btn btn--secondary btn--full" id="scrape-btn">🌐 Open Market Browser</button>
           <button class="btn btn--secondary btn--full btn--sm" id="scroll-btn">⏬ Auto-Scroll</button>
           <button class="btn btn--add btn--full btn--sm" id="extract-btn">⬇️ Extract Data</button>
+          <button class="btn btn--secondary btn--full btn--sm mt-8" id="save-tracked-btn">💾 Save to Favorites</button>
         </div>
       </div>
 
-      <!-- Removed Tracked Mods Section -->
+      <!-- Saved Favorites Section -->
+      <div class="sidebar__section" style="flex:1;">
+        <div class="sidebar__title"><span class="dot" style="background:var(--accent-amber);box-shadow:0 0 6px rgba(245,158,11,0.4);"></span> Saved Favorites</div>
+        <ul class="tracked-list" id="tracked-list">
+          <li style="font-size:12px;color:var(--text-muted);padding:8px 0;">No favorites yet</li>
+        </ul>
+      </div>
 
       <!-- Settings -->
       <div class="sidebar__section">
