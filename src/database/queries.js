@@ -104,13 +104,15 @@ class MarketDB {
 
   // ── Daily Price Aggregation ──
 
-  computeDailyPrices(dateStr = null) {
-    const date = dateStr || new Date().toISOString().split('T')[0];
+  computeDailyPrices() {
+    const d = new Date();
+    const date = new Date(d.getTime() - (d.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
 
+    // Get all listings for today
     const listings = this._all(`
       SELECT l.id, l.mod_name, l.platform, l.price
       FROM listings l
-      WHERE DATE(l.scraped_at) = ?
+      WHERE DATE(l.scraped_at, 'localtime') = ?
     `, [date]);
 
     // Group by mod_name + platform
@@ -236,7 +238,8 @@ class MarketDB {
   }
 
   getTodayPrices(modName, platform = null) {
-    const today = new Date().toISOString().split('T')[0];
+    const d = new Date();
+    const today = new Date(d.getTime() - (d.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
     let query = 'SELECT * FROM daily_prices WHERE mod_name = ? AND date = ?';
     const params = [modName, today];
     if (platform && platform !== 'ALL') {
