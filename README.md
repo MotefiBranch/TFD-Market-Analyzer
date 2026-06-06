@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/github-banner.png" alt="TFD Market Analyzer Banner" width="100%">
+</p>
+
 # TFD Market Analyzer
 
 A powerful, mathematically accurate market analysis tool for **The First Descendant**. 
@@ -7,7 +11,7 @@ This application serves as a desktop overlay companion that allows you to calcul
 ## Features
 
 - **True Weighted Statistics**: Most price aggregators simply take the average of all unique price points. The TFD Market Analyzer weights prices by listing volume, ensuring that 200 listings at 20 Caliber carry vastly more mathematical weight than 1 listing at 2,000 Caliber.
-- **Manual "ToS-Safe" Extraction**: To respect Nexon's Terms of Service and anti-bot protections, this tool contains **zero headless automation or background scraping**. You open the built-in Market Browser, navigate the site exactly as a human would, and click "Extract" to instantly run analytics on whatever is loaded on your screen.
+- **Manual "ToS-Safe" Extraction**: To respect Nexon's Terms of Service and anti-bot protections, this tool contains **zero headless automation or background scraping**. You open the built-in Market Browser, navigate the site exactly as you normally would, and click "Extract" to instantly run analytics on whatever is loaded on your screen.
 - **Stat Matcher**: Input your ideal stats (e.g., Skill Cooldown, HP Heal) and the tool will automatically parse and rank the live listings to find exactly what you are looking for.
 - **Local Persistence**: All historical pricing data is saved securely to a local SQLite database, building a localized historical price trend chart the more you use it.
 
