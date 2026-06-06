@@ -558,14 +558,11 @@ function renderListings(listings) {
           ${stats.map(s => {
             let cls = s.isPositive ? 'positive' : s.isNegative ? 'negative' : 'neutral';
             
-            const rawValue = String(s.statValue || '');
-            if (rawValue.includes('[x]')) {
-              cls = 'ultimate';
-            } else if (cls === 'neutral') {
+            if (cls === 'neutral') {
               cls = 'positive';
             }
 
-            const cleanValue = rawValue.replace(/\[\+\]|\[\-\]|\[x\]/g, '').trim();
+            const cleanValue = String(s.statValue || '').replace(/\[\+\]|\[\-\]/g, '').trim();
             return `<span class="stat-chip ${cls}">${escapeHtml(s.statName || '')} ${escapeHtml(cleanValue)}</span>`;
           }).join('')}
         </div>
