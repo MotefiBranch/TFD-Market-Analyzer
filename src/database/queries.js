@@ -58,13 +58,14 @@ class MarketDB {
 
         this._run(`
           INSERT INTO listings (scrape_id, scraped_at, mod_name, category, socket_type,
-            required_rank, price, platform, reroll_count, seller_name, seller_status, seller_rank, reg_date)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            required_rank, price, platform, reroll_count, seller_name, seller_status, seller_rank, reg_date, available_characters)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `, [
           scrapeId, now, mod.name || '', mod.category || '', mod.socketType || '',
           mod.requiredRank || '', price, mod.platform || platform,
           parseInt(mod.rerollCount) || 0, mod.sellerName || '', mod.sellerStatus || '',
-          mod.sellerRank || '', mod.regDate || ''
+          mod.sellerRank || '', mod.regDate || '',
+          mod.availableCharacters ? JSON.stringify(mod.availableCharacters) : '[]'
         ]);
 
         // Get last inserted ID
@@ -206,6 +207,12 @@ class MarketDB {
 
     // Attach stats to each listing
     for (const listing of listings) {
+      try {
+        listing.available_characters = listing.available_characters ? JSON.parse(listing.available_characters) : [];
+      } catch (e) {
+        listing.available_characters = [];
+      }
+      
       listing.stats = this._all(`
         SELECT stat_name as statName, stat_value as statValue, is_positive as isPositive, is_negative as isNegative, raw_label as rawLabel
         FROM listing_stats WHERE listing_id = ?

@@ -44,7 +44,13 @@ function parseMarketPage() {
       if (an && !attributes.includes(an)) attributes.push(an);
       stats.push({ raw: lr, positive: pos, negative: neg, value: ve ? ve.textContent.trim() : '' });
     });
-    return { name, category, socketType, requiredRank, price, platform, rerollCount, sellerName, sellerStatus, sellerRank, regDate: gt('.information .date span'), attributes, stats };
+    const availableCharacters = [];
+    item.querySelectorAll('.available-character img').forEach(img => {
+      const name = img.getAttribute('alt');
+      const src = img.getAttribute('src');
+      if (name && src) availableCharacters.push({ name, src });
+    });
+    return { name, category, socketType, requiredRank, price, platform, rerollCount, sellerName, sellerStatus, sellerRank, regDate: gt('.information .date span'), attributes, stats, availableCharacters };
   }
 
   function parseTrigger(item) {

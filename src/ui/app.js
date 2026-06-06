@@ -587,6 +587,11 @@ function renderListings(listings) {
             return `<span class="stat-chip ${cls}">${escapeHtml(s.statName || '')} ${escapeHtml(cleanValue)}</span>`;
           }).join('')}
         </div>
+        ${l.available_characters && l.available_characters.length > 0 ? `
+        <div class="listing-card__characters" style="margin-top: 8px; display: flex; gap: 4px; flex-wrap: wrap;">
+          ${l.available_characters.map(char => `<img src="${char.src}" alt="${escapeHtml(char.name)}" title="${escapeHtml(char.name)}" style="width: 24px; height: 24px; border-radius: 50%; border: 1px solid var(--glass-border);">`).join('')}
+        </div>
+        ` : ''}
       </div>
     `;
   }).join('');

@@ -57,7 +57,8 @@ async function initDatabase(dbPath) {
       seller_name TEXT,
       seller_status TEXT,
       seller_rank TEXT,
-      reg_date TEXT
+      reg_date TEXT,
+      available_characters TEXT
     )
   `);
 
@@ -72,6 +73,27 @@ async function initDatabase(dbPath) {
       raw_label TEXT
     )
   `);
+
+  db.run(`
+    CREATE TABLE IF NOT EXISTS price_history (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      scrape_id TEXT NOT NULL,
+      mod_name TEXT NOT NULL,
+      platform TEXT,
+      median_price INTEGER,
+      min_price INTEGER,
+      max_price INTEGER,
+      volume INTEGER,
+      created_at TEXT DEFAULT (datetime('now'))
+    )
+  `);
+
+  // Schema Migration
+  try {
+    db.run('ALTER TABLE listings ADD COLUMN available_characters TEXT;');
+  } catch (err) {
+    // Column likely exists
+  }
 
   db.run(`
     CREATE TABLE IF NOT EXISTS daily_prices (
