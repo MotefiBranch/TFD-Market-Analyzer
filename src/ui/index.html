@@ -39,9 +39,21 @@
         </div>
       </div>
 
-      <!-- Stat Builder Section -->
+      <!-- Target Lookup Section -->
       <div class="sidebar__section">
-        <div class="sidebar__title"><span class="dot" style="background:var(--accent-purple);box-shadow:0 0 6px rgba(139,92,246,0.4);"></span> Target Stats</div>
+        <div class="sidebar__title"><span class="dot" style="background:var(--accent-purple);box-shadow:0 0 6px rgba(139,92,246,0.4);"></span> Target Lookup</div>
+        
+        <div style="margin-bottom: 12px;">
+          <input list="socket-types" id="target-socket-input" class="search-input" placeholder="Socket Type (e.g. Malachite)" style="width:100%; padding:6px 10px; font-size:12px;">
+          <datalist id="socket-types">
+            <option value="Cerulean">
+            <option value="Rutile">
+            <option value="Malachite">
+            <option value="Xantic">
+            <option value="Almandine">
+          </datalist>
+        </div>
+
         <div id="stat-rows"></div>
         <button class="btn btn--add btn--sm btn--full mt-8" id="add-stat-btn">+ Add Stat</button>
       </div>

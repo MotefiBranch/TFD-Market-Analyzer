@@ -287,12 +287,13 @@ async function runAnalysis() {
 
   const stats = getTargetStats();
   const platform = platformSelect.value;
+  const targetSocket = $('target-socket-input')?.value?.trim() || null;
 
   analyzeBtn.disabled = true;
   analyzeBtn.textContent = '⏳ Analyzing...';
 
   try {
-    const result = await window.tfdApi.analyze(selectedMod, stats, platform, 30);
+    const result = await window.tfdApi.analyze(selectedMod, stats, platform, 30, targetSocket);
     currentAnalysis = result;
 
     emptyState.classList.add('hidden');

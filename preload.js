@@ -14,7 +14,7 @@ contextBridge.exposeInMainWorld('tfdApi', {
 
   // ── Analysis ──
   searchMods: (query) => ipcRenderer.invoke('analysis:search', query),
-  analyze: (modName, stats, platform, days) => ipcRenderer.invoke('analysis:analyze', modName, stats, platform, days),
+  analyze: (modName, stats, platform, days, targetSocket) => ipcRenderer.invoke('analysis:analyze', modName, stats, platform, days, targetSocket),
   getHistory: (modName, platform, days) => ipcRenderer.invoke('analysis:history', modName, platform, days),
   getStatsForMod: (modName) => ipcRenderer.invoke('analysis:stats', modName),
 

@@ -184,12 +184,17 @@ function registerIPC() {
     return marketDB.getStatsForMod(modName);
   });
 
-  ipcMain.handle('analysis:analyze', (_e, modName, targetStats, platform, days) => {
+  ipcMain.handle('analysis:analyze', (_e, modName, targetStats, platform, days, targetSocket) => {
     const p = platform || settings.platform;
     const d = days || 30;
 
     // Get listings with stats
-    const listings = marketDB.getListingsWithStats(modName, p, d);
+    let listings = marketDB.getListingsWithStats(modName, p, d);
+
+    if (targetSocket) {
+      const ts = targetSocket.toLowerCase();
+      listings = listings.filter(l => l.socket_type && l.socket_type.toLowerCase().includes(ts));
+    }
 
     // Rank by stat match
     const ranked = StatMatcher.rankListings(targetStats || [], listings);
