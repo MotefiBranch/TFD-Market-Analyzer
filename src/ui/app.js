@@ -350,15 +350,16 @@ async function runAnalysis() {
     await selectMod(modSearch.value.trim());
   }
 
-  if (!selectedMod) {
-    showToast('Please select a module first');
+  const targetCharacter = $('target-character-input')?.value?.trim() || null;
+
+  if (!selectedMod && !targetCharacter) {
+    showToast('Please select a module or a Character first');
     return;
   }
 
   const stats = getTargetStats();
   const platform = platformSelect.value;
   const targetSocket = $('target-socket-input')?.value?.trim() || null;
-  const targetCharacter = $('target-character-input')?.value?.trim() || null;
 
   analyzeBtn.disabled = true;
   analyzeBtn.textContent = '⏳ Analyzing...';

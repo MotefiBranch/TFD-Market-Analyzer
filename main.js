@@ -207,22 +207,24 @@ function registerIPC() {
     // Rank by stat match
     const ranked = StatMatcher.rankListings(targetStats || [], listings);
 
-    // Get price history
-    const history = marketDB.getDailyPriceHistory(modName, p, d);
+    // Get price history (only if a specific mod is selected)
+    const history = modName ? marketDB.getDailyPriceHistory(modName, p, d) : [];
 
     // Build chart data
     const chartData = TrendComputer.buildChartData(history);
 
     // Compute summary
     let summary;
-    if (history.length === 0 && ranked.length === 0 && targetStats && targetStats.length > 0) {
+    if (!modName) {
+      summary = { median: 0, change: 0, stability: 'N/A', averageVolume: 0 };
+    } else if (history.length === 0 && ranked.length === 0 && targetStats && targetStats.length > 0) {
       summary = Estimator.estimatePrice(marketDB, modName, targetStats, p);
     } else {
       summary = PricingCalculator.computeSummary(history);
     }
 
     // Get today's data
-    const todayPrices = marketDB.getTodayPrices(modName, p);
+    const todayPrices = modName ? marketDB.getTodayPrices(modName, p) : [];
 
     return {
       summary,

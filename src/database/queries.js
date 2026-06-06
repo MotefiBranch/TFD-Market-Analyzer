@@ -189,8 +189,13 @@ class MarketDB {
     dateLimit.setDate(dateLimit.getDate() - days);
     const dateLimitStr = dateLimit.toISOString();
 
-    let query = 'SELECT * FROM listings WHERE mod_name = ? AND scraped_at >= ?';
-    const params = [modName, dateLimitStr];
+    let query = 'SELECT * FROM listings WHERE scraped_at >= ?';
+    const params = [dateLimitStr];
+
+    if (modName && modName !== 'ALL') {
+      query += ' AND mod_name = ?';
+      params.push(modName);
+    }
 
     if (platform && platform !== 'ALL') {
       if (platform === 'PC') query += " AND platform IN ('PC', 'Steam', 'STEAM', 'All-Platform')";
