@@ -38,7 +38,8 @@ function parseMarketPage() {
       const ne = opt.querySelector('.option-name'), ve = opt.querySelector('.option-value');
       if (!ne) return;
       const lr = ne.textContent.trim();
-      const pos = lr.startsWith('(+)'), neg = lr.startsWith('(-)');
+      const pos = opt.className.includes('advantage') || lr.startsWith('(+)');
+      const neg = opt.className.includes('penalty') || lr.startsWith('(-)');
       let an = lr.replace(/^\(\+\)|^\(\-\)/, '').split('[')[0].trim();
       if (an && !attributes.includes(an)) attributes.push(an);
       stats.push({ raw: lr, positive: pos, negative: neg, value: ve ? ve.textContent.trim() : '' });
@@ -76,9 +77,11 @@ function parseMarketPage() {
     item.querySelectorAll('.item__details .option').forEach(opt => {
       const ne = opt.querySelector('.option-name'), ve = opt.querySelector('.option-value');
       const lt = ne ? ne.textContent.trim() : '', vt = ve ? ve.textContent.trim() : '';
+      const pos = opt.className.includes('advantage');
+      const neg = opt.className.includes('penalty');
       let an = lt.split('(')[0].trim();
       if (an && !attributes.includes(an)) attributes.push(an);
-      stats.push({ raw: lt + ' ' + vt, positive: false, negative: false, value: vt });
+      stats.push({ raw: lt + ' ' + vt, positive: pos, negative: neg, value: vt });
     });
     return { name, category, socketType: '', requiredRank, price, platform, rerollCount, sellerName, sellerStatus, sellerRank, regDate: gt('.information .date span'), attributes, stats };
   }
