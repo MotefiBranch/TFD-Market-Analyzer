@@ -5,7 +5,11 @@ A powerful, mathematically accurate market analysis tool for **The First Descend
 This application serves as a desktop overlay companion that allows you to calculate the **true market value** of Ancestral Modules. By applying a weighted distribution to live market listings, this tool automatically filters out absurdly priced "god rolls" to show you exactly where the realistic market median and average prices land.
 
 ## Screenshots & Demo
-*(Drag and drop your application screenshots and .mp4 tutorial video here when editing on GitHub!)*
+*<img width="1392" height="891" alt="image 1" src="https://github.com/user-attachments/assets/82fb205c-2388-4b63-845e-651e3070af3b" /> 
+
+https://github.com/user-attachments/assets/f3192ab3-cb39-49f1-95b9-ff1ade6f0a33
+
+*
 
 ## Features
 
