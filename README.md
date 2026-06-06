@@ -1,12 +1,11 @@
-<p align="center">
-  <img src="assets/github-banner.png" alt="TFD Market Analyzer Banner" width="100%">
-</p>
-
 # TFD Market Analyzer
 
 A powerful, mathematically accurate market analysis tool for **The First Descendant**. 
 
 This application serves as a desktop overlay companion that allows you to calculate the **true market value** of Ancestral Modules. By applying a weighted distribution to live market listings, this tool automatically filters out absurdly priced "god rolls" to show you exactly where the realistic market median and average prices land.
+
+## Screenshots & Demo
+*(Drag and drop your application screenshots and .mp4 tutorial video here when editing on GitHub!)*
 
 ## Features
 
