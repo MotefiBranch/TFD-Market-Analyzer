@@ -51,14 +51,25 @@ const CHARACTER_GOD_ROLLS = {
   "Freyna": ["Toxic Skill Power Boost Ratio", "Tech Skill Power Boost Ratio"],
   "Ultimate Freyna": ["Toxic Skill Power Boost Ratio", "Tech Skill Power Boost Ratio"],
   "Yujin": ["Non-Attribute Skill Power Boost Ratio", "Fusion Skill Power Boost Ratio"],
+  "Ultimate Yujin": ["Non-Attribute Skill Power Boost Ratio", "Fusion Skill Power Boost Ratio"],
   "Enzo": ["Non-Attribute Skill Power Boost Ratio", "Dimension Skill Power Boost Ratio"],
   "Luna": ["Non-Attribute Skill Power Boost Ratio", "Tech Skill Power Boost Ratio"],
+  "Ultimate Luna": ["Non-Attribute Skill Power Boost Ratio", "Tech Skill Power Boost Ratio"],
   "Sharen": ["Electric Skill Power Boost Ratio", "Fusion Skill Power Boost Ratio"],
+  "Ultimate Sharen": ["Electric Skill Power Boost Ratio", "Fusion Skill Power Boost Ratio"],
   "Blair": ["Fire Skill Power Boost Ratio", "Dimension Skill Power Boost Ratio"],
+  "Ultimate Blair": ["Fire Skill Power Boost Ratio", "Dimension Skill Power Boost Ratio"],
   "Jayber": ["Non-Attribute Skill Power Boost Ratio", "Dimension Skill Power Boost Ratio"],
   "Kyle": ["Non-Attribute Skill Power Boost Ratio", "Dimension Skill Power Boost Ratio"],
   "Esiemo": ["Fire Skill Power Boost Ratio", "Tech Skill Power Boost Ratio"],
-  "Hailey": ["Chill Skill Power Boost Ratio", "Singular Skill Power Boost Ratio"]
+  "Ultimate Esiemo": ["Fire Skill Power Boost Ratio", "Tech Skill Power Boost Ratio"],
+  "Hailey": ["Chill Skill Power Boost Ratio", "Singular Skill Power Boost Ratio"],
+  "Dia": ["Non-Attribute Skill Power Boost Ratio", "Dimension Skill Power Boost Ratio"],
+  "Harris": ["Toxic Skill Power Boost Ratio", "Singular Skill Power Boost Ratio"],
+  "Ines": ["Electric Skill Power Boost Ratio", "Tech Skill Power Boost Ratio"],
+  "Keelan": ["Toxic Skill Power Boost Ratio", "Fusion Skill Power Boost Ratio"],
+  "Nell": ["Non-Attribute Skill Power Boost Ratio", "Tech Skill Power Boost Ratio", "Fusion Skill Power Boost Ratio"],
+  "Serena": ["Fire Skill Power Boost Ratio", "Tech Skill Power Boost Ratio"]
 };
 
 // ── Initialization ──
@@ -131,6 +142,37 @@ document.addEventListener('DOMContentLoaded', async () => {
   renderFavorites();
   renderWatchlist();
   await updateDbStats();
+
+  const dbHistorySelect = $('db-history-select');
+  if (dbHistorySelect) {
+    try {
+      const allMods = await window.tfdApi.getAllMods();
+      if (allMods && allMods.length > 0) {
+        allMods.sort().forEach(mod => {
+          const opt = document.createElement('option');
+          opt.value = mod;
+          opt.textContent = mod;
+          dbHistorySelect.appendChild(opt);
+        });
+      }
+      dbHistorySelect.addEventListener('change', (e) => {
+        const val = e.target.value;
+        if (val) {
+          modSearch.value = val;
+          searchDropdown.classList.remove('show');
+          selectedMod = val;
+          selectedModName.textContent = val;
+          selectedModDisplay.classList.remove('hidden');
+          runAnalysis();
+          dbHistorySelect.value = '';
+        }
+      });
+    } catch(err) {
+      console.error('Failed to load DB history:', err);
+    }
+  }
+
+  initCustomDescendants();
   initScrapeStatusListener();
 });
 
@@ -1006,7 +1048,7 @@ function renderListings(listings) {
             ${l.socket_type ? `<img src="assets/sockets/${escapeHtml(l.socket_type.toLowerCase())}.png" alt="${escapeHtml(l.socket_type)}" title="${escapeHtml(l.socket_type)}" style="width:14px; height:14px; vertical-align:middle; margin-left:4px; opacity: 0.8;">` : ''}
           </span>
         </div>
-        <div class="listing-card__stats">
+        <div class="listing-card__stats" style="display: flex; flex-direction: column; align-items: flex-start; gap: 4px;">
           ${stats.map(s => {
             let cls = s.isPositive ? 'positive' : s.isNegative ? 'negative' : 'neutral';
             
@@ -1014,16 +1056,15 @@ function renderListings(listings) {
               const rawValue = String(s.statValue || '');
               const statName = (s.statName || '').toLowerCase();
               
-              // Only consider the actual value part, not dashes in the name
               const isNegativeMath = rawValue.startsWith('-');
               const isInverseStat = statName.includes('cooldown') || statName.includes('cost');
 
               if (isNegativeMath && !isInverseStat) {
-                cls = 'negative'; // Decreased Power/Damage (Bad)
+                cls = 'negative';
               } else if (!isNegativeMath && isInverseStat && rawValue.match(/[0-9]/)) {
-                cls = 'negative'; // Increased Cooldown/Cost (Bad)
+                cls = 'negative';
               } else {
-                cls = 'positive'; // Normal buff (Good)
+                cls = 'positive';
               }
             }
 
@@ -1064,13 +1105,28 @@ function stopBackgroundTracker() {
 }
 
 async function executeBackgroundTracking() {
-  if (!appSettings.autoTrack || !appSettings.trackedListings || appSettings.trackedListings.length === 0) return;
+  if (!appSettings.autoTrack) return;
   
-  // Get unique module names from the watchlist that are not explicitly Sold/Removed
-  const activeTracked = appSettings.trackedListings.filter(l => l.status !== 'Sold/Removed');
-  if (activeTracked.length === 0) return;
+  // Gather unique modules from both active Watchlist AND DB History
+  let uniqueMods = [];
+  try {
+    const historyMods = await window.tfdApi.getAllMods();
+    if (historyMods) uniqueMods.push(...historyMods);
+  } catch (err) {
+    console.error('Failed to get DB history for tracking:', err);
+  }
+
+  if (appSettings.trackedListings && appSettings.trackedListings.length > 0) {
+    const activeTracked = appSettings.trackedListings.filter(l => l.status !== 'Sold/Removed').map(l => l.modName);
+    uniqueMods.push(...activeTracked);
+  }
   
-  const uniqueMods = [...new Set(activeTracked.map(l => l.modName))];
+  // Deduplicate the list
+  uniqueMods = [...new Set(uniqueMods)];
+  
+  if (uniqueMods.length === 0) return;
+  
+  console.log(`Starting background tracking for ${uniqueMods.length} modules...`);
   
   for (const mod of uniqueMods) {
     try {
@@ -1092,7 +1148,7 @@ async function executeBackgroundTracking() {
       const extractRes = await window.tfdApi.scrape(mod, appSettings.platform, true);
       
       if (extractRes.success && extractRes.count > 0) {
-        // Run analysis silently to get the stats array properly formatted, looking at last 1 day
+        // Run analysis silently to check watchlist status triggers
         const result = await window.tfdApi.analyze(mod, [], appSettings.platform, 1);
         await checkWatchlistStatus(result.listings, mod);
       }
@@ -1105,6 +1161,7 @@ async function executeBackgroundTracking() {
       await window.tfdApi.closeBrowser();
     }
   }
+  console.log('Background tracking cycle complete.');
 }
 
 // ── Utilities ──
@@ -1154,4 +1211,169 @@ function showToast(message) {
     toast.style.transition = 'opacity 300ms';
     setTimeout(() => toast.remove(), 300);
   }, 3000);
+}
+
+// ── Custom Descendants Management ──
+function renderCustomDescendantHistory() {
+  const historyList = $('custom-desc-history');
+  if (!historyList) return;
+
+  historyList.innerHTML = '';
+  
+  let savedCustomDesc = {};
+  try {
+    savedCustomDesc = JSON.parse(localStorage.getItem('custom_descendants')) || {};
+  } catch(e) {}
+
+  const names = Object.keys(savedCustomDesc);
+  
+  if (names.length === 0) {
+    historyList.innerHTML = '<li style="font-size:12px;color:var(--text-muted);text-align:center;padding:10px;">No custom descendants found</li>';
+    return;
+  }
+
+  names.forEach(name => {
+    const li = document.createElement('li');
+    li.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding:8px 12px; background:rgba(255,255,255,0.03); border-radius:6px; margin-bottom:6px;';
+    
+    const infoDiv = document.createElement('div');
+    infoDiv.style.cssText = 'display:flex; flex-direction:column;';
+    
+    const nameSpan = document.createElement('span');
+    nameSpan.style.cssText = 'font-size:13px; font-weight:600; color:var(--text-primary); margin-bottom:2px;';
+    nameSpan.textContent = name;
+    
+    const stats = savedCustomDesc[name];
+    const statsSpan = document.createElement('span');
+    statsSpan.style.cssText = 'font-size:10px; color:var(--text-muted);';
+    statsSpan.textContent = stats.join(' · ');
+    
+    infoDiv.appendChild(nameSpan);
+    infoDiv.appendChild(statsSpan);
+    
+    const delBtn = document.createElement('button');
+    delBtn.innerHTML = '🗑️';
+    delBtn.style.cssText = 'background:none; border:none; cursor:pointer; font-size:14px; opacity:0.6; padding:4px; transition:opacity 0.2s;';
+    delBtn.onmouseover = () => delBtn.style.opacity = '1';
+    delBtn.onmouseout = () => delBtn.style.opacity = '0.6';
+    
+    delBtn.onclick = () => {
+      delete savedCustomDesc[name];
+      localStorage.setItem('custom_descendants', JSON.stringify(savedCustomDesc));
+      delete CHARACTER_GOD_ROLLS[name];
+      
+      const charSelect = $('target-character-select');
+      if (charSelect) {
+        for (let i = 0; i < charSelect.options.length; i++) {
+          if (charSelect.options[i].value === name) {
+            charSelect.remove(i);
+            break;
+          }
+        }
+      }
+      renderCustomDescendantHistory();
+    };
+    
+    li.appendChild(infoDiv);
+    li.appendChild(delBtn);
+    historyList.appendChild(li);
+  });
+}
+
+function initCustomDescendants() {
+  const openModalBtn = $('btn-open-custom-desc-modal');
+  const modal = $('custom-desc-modal');
+  const closeModalBtn = $('close-custom-desc-modal');
+  const addBtn = $('btn-add-custom-desc');
+
+  if (!openModalBtn || !modal) return;
+
+  let savedCustomDesc = {};
+  try {
+    savedCustomDesc = JSON.parse(localStorage.getItem('custom_descendants')) || {};
+    for (const [name, stats] of Object.entries(savedCustomDesc)) {
+      CHARACTER_GOD_ROLLS[name] = stats;
+      
+      const charSelect = $('target-character-select');
+      if (charSelect) {
+        const existing = Array.from(charSelect.options).find(opt => opt.value === name);
+        if (!existing) {
+          const opt = document.createElement('option');
+          opt.value = name;
+          opt.textContent = name;
+          charSelect.appendChild(opt);
+        }
+      }
+    }
+  } catch (err) {}
+
+  openModalBtn.addEventListener('click', () => {
+    modal.classList.remove('hidden');
+    modal.style.display = 'flex';
+    renderCustomDescendantHistory();
+  });
+
+  closeModalBtn.addEventListener('click', () => {
+    modal.classList.add('hidden');
+    modal.style.display = 'none';
+  });
+
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      modal.classList.add('hidden');
+      modal.style.display = 'none';
+    }
+  });
+
+  if (addBtn) {
+    addBtn.addEventListener('click', () => {
+      const nameInput = $('custom-desc-name').value.trim();
+      const attrInput = $('custom-desc-attribute').value;
+      const archInput = $('custom-desc-archetype').value;
+      const archInput2 = $('custom-desc-archetype-2').value;
+
+      if (!nameInput || !attrInput || !archInput) {
+        showToast('⚠️ Please enter a name, attribute, and primary archetype.');
+        return;
+      }
+
+      const generatedStats = [
+        `${attrInput} Skill Power Boost Ratio`,
+        `${archInput} Skill Power Boost Ratio`
+      ];
+
+      if (archInput2 && archInput2 !== archInput) {
+        generatedStats.push(`${archInput2} Skill Power Boost Ratio`);
+      }
+
+      CHARACTER_GOD_ROLLS[nameInput] = generatedStats;
+
+      try {
+        const saved = JSON.parse(localStorage.getItem('custom_descendants')) || {};
+        saved[nameInput] = generatedStats;
+        localStorage.setItem('custom_descendants', JSON.stringify(saved));
+      } catch (err) {}
+
+      const charSelect = $('target-character-select');
+      if (charSelect) {
+        let existing = Array.from(charSelect.options).find(opt => opt.value === nameInput);
+        if (!existing) {
+          const opt = document.createElement('option');
+          opt.value = nameInput;
+          opt.textContent = nameInput;
+          charSelect.appendChild(opt);
+          charSelect.value = nameInput;
+        }
+      }
+
+      showToast(`✅ Custom descendant ${nameInput} added!`);
+      
+      $('custom-desc-name').value = '';
+      $('custom-desc-attribute').value = '';
+      $('custom-desc-archetype').value = '';
+      $('custom-desc-archetype-2').value = '';
+      
+      renderCustomDescendantHistory();
+    });
+  }
 }
