@@ -8,6 +8,7 @@ let selectedMod = null;
 let targetStats = [];
 let currentTab = '30';
 let currentAnalysis = null;
+let currentListings = [];
 let priceChart = null;
 let searchDebounce = null;
 
@@ -61,7 +62,7 @@ const CHARACTER_GOD_ROLLS = {
 };
 
 // ── Initialization ──
-let appSettings = { platform: 'PC', favorites: [] };
+let appSettings = { platform: 'PC', favorites: [], trackedListings: [], autoTrack: false, trackInterval: 10 };
 
 document.addEventListener('DOMContentLoaded', async () => {
   initWindowControls();
@@ -73,19 +74,67 @@ document.addEventListener('DOMContentLoaded', async () => {
   
   appSettings = await window.tfdApi.getSettings() || appSettings;
   if (!appSettings.favorites) appSettings.favorites = [];
+  if (!appSettings.trackedListings) appSettings.trackedListings = [];
+  if (appSettings.autoTrack === undefined) appSettings.autoTrack = false;
+  if (appSettings.trackInterval === undefined) appSettings.trackInterval = 10;
   if (appSettings.platform) platformSelect.value = appSettings.platform;
+  
+  const autoTrackToggle = $('auto-track-toggle');
+  const trackIntervalSelect = $('track-interval-select');
+  
+  if (autoTrackToggle) {
+    autoTrackToggle.checked = appSettings.autoTrack;
+    autoTrackToggle.addEventListener('change', async () => {
+      if (autoTrackToggle.checked) {
+        const confirmed = window.confirm("⚠️ WARNING: ZERO-INPUT AUTOMATION ⚠️\n\nEnabling Background Auto-Tracking turns this tool into an automated bot. This explicitly violates Nexon's Terms of Service. If abused or detected, it could result in an account ban.\n\nDo you accept the risk and wish to enable this feature?");
+        if (!confirmed) {
+          autoTrackToggle.checked = false;
+          return;
+        }
+      }
+      
+      appSettings.autoTrack = autoTrackToggle.checked;
+      await window.tfdApi.updateSettings({ autoTrack: appSettings.autoTrack });
+      if (appSettings.autoTrack) startBackgroundTracker();
+      else stopBackgroundTracker();
+    });
+  }
+  
+  if (trackIntervalSelect) {
+    trackIntervalSelect.value = appSettings.trackInterval;
+    trackIntervalSelect.addEventListener('change', async () => {
+      appSettings.trackInterval = parseInt(trackIntervalSelect.value, 10);
+      await window.tfdApi.updateSettings({ trackInterval: appSettings.trackInterval });
+      if (appSettings.autoTrack) {
+        stopBackgroundTracker();
+        startBackgroundTracker();
+      }
+    });
+  }
+  
+  if (appSettings.autoTrack) startBackgroundTracker();
   
   platformSelect.addEventListener('change', async () => {
     appSettings.platform = platformSelect.value;
     await window.tfdApi.updateSettings({ platform: appSettings.platform });
   });
 
+  const listingsSortSelect = $('listings-sort-select');
+  if (listingsSortSelect) {
+    listingsSortSelect.addEventListener('change', () => {
+      if (currentListings && currentListings.length > 0) {
+        renderListings(currentListings);
+      }
+    });
+  }
+
   renderFavorites();
+  renderWatchlist();
   await updateDbStats();
   initScrapeStatusListener();
 });
 
-// ── Favorites ──
+// ── Favorites & Watchlist ──
 function renderFavorites() {
   if (!trackedList) return;
   trackedList.innerHTML = '';
@@ -121,6 +170,95 @@ function renderFavorites() {
     trackedList.appendChild(li);
   });
 }
+
+function renderWatchlist() {
+  const watchlistEl = $('watchlist-list');
+  if (!watchlistEl) return;
+  watchlistEl.innerHTML = '';
+  
+  if (!appSettings.trackedListings || appSettings.trackedListings.length === 0) {
+    watchlistEl.innerHTML = '<li style="font-size:12px;color:var(--text-muted);padding:8px 0;">No tracked listings</li>';
+    return;
+  }
+  
+  appSettings.trackedListings.forEach(item => {
+    const li = document.createElement('li');
+    const isSold = item.status === 'Sold/Removed';
+    const isPriceChanged = item.status === 'Price Changed';
+    
+    let statusStyle = "color:var(--text-secondary);";
+    if (isSold) statusStyle = "color:var(--text-danger);";
+    if (isPriceChanged) statusStyle = "color:var(--accent-amber);";
+    
+    li.style.cssText = `display:flex; flex-direction:column; padding:8px; background:var(--bg-elevated); border:1px solid var(--glass-border); border-radius:6px; margin-bottom:6px; cursor:pointer; opacity: ${isSold ? '0.6' : '1'};`;
+    
+    li.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+        <span style="font-size:12px; font-weight:600; color:var(--text-primary);">${escapeHtml(item.modName)}</span>
+        <button class="delete-wl-btn" style="background:none; border:none; color:var(--text-danger); cursor:pointer; font-size:14px; padding:0;">×</button>
+      </div>
+      <div style="font-size:11px; color:var(--text-secondary); margin-top:2px;">
+        Sold by: <strong style="color:var(--text-bright);">${escapeHtml(item.sellerName)}</strong>
+      </div>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
+        <span style="font-size:12px; font-weight:bold; color:var(--accent-blue);">${formatPrice(item.price)} Cal</span>
+        <span style="font-size:10px; font-weight:bold; ${statusStyle}">${item.status}</span>
+      </div>
+    `;
+    
+    li.addEventListener('click', (e) => {
+      if (e.target.tagName !== 'BUTTON') {
+        selectMod(item.modName);
+        runAnalysis();
+      }
+    });
+    
+    li.querySelector('.delete-wl-btn').addEventListener('click', async (e) => {
+      e.stopPropagation();
+      appSettings.trackedListings = appSettings.trackedListings.filter(m => m.id !== item.id);
+      await window.tfdApi.updateSettings({ trackedListings: appSettings.trackedListings });
+      renderWatchlist();
+      showToast('Removed from watchlist');
+    });
+    
+    watchlistEl.appendChild(li);
+  });
+}
+
+window.toggleTrackListing = async function(btnElement, listingJson) {
+  const listing = JSON.parse(decodeURIComponent(listingJson));
+  const id = `${listing.sellerName}_${listing.statSignature}`;
+  
+  const existingIdx = appSettings.trackedListings.findIndex(l => l.id === id);
+  
+  if (existingIdx >= 0) {
+    appSettings.trackedListings.splice(existingIdx, 1);
+    btnElement.innerHTML = '☆';
+    btnElement.title = 'Track Listing';
+    btnElement.style.color = 'var(--text-muted)';
+    showToast('Removed from Watchlist');
+  } else {
+    appSettings.trackedListings.push({
+      id: id,
+      modName: selectedMod,
+      sellerName: listing.sellerName,
+      price: listing.price,
+      statSignature: listing.statSignature,
+      socketType: listing.socketType,
+      requiredRank: listing.requiredRank,
+      addedAt: new Date().toISOString(),
+      lastSeenAt: new Date().toISOString(),
+      status: 'Active'
+    });
+    btnElement.innerHTML = '⭐';
+    btnElement.title = 'Untrack Listing';
+    btnElement.style.color = 'var(--accent-amber)';
+    showToast('⭐ Saved to Watchlist!');
+  }
+  
+  await window.tfdApi.updateSettings({ trackedListings: appSettings.trackedListings });
+  renderWatchlist();
+};
 
 // ── Window Controls ──
 function initWindowControls() {
@@ -345,7 +483,33 @@ function initActions() {
   });
 
   $('refresh-favorites-btn')?.addEventListener('click', () => startInteractiveRefresh('favorites'));
+  $('refresh-watchlist-btn')?.addEventListener('click', () => startInteractiveRefresh('watchlist'));
   $('refresh-all-btn')?.addEventListener('click', () => startInteractiveRefresh('all'));
+  
+  // Developer Settings Modal (Konami Code)
+  $('close-dev-settings-btn')?.addEventListener('click', () => {
+    $('dev-settings-modal').style.display = 'none';
+  });
+
+  const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
+  let konamiIndex = 0;
+  
+  document.addEventListener('keydown', (e) => {
+    if (e.key === konamiCode[konamiIndex]) {
+      konamiIndex++;
+      if (konamiIndex === konamiCode.length) {
+        konamiIndex = 0;
+        showToast('🎮 DEVELOPER MODE UNLOCKED!');
+        const modal = $('dev-settings-modal');
+        if (modal) {
+          modal.style.display = 'flex';
+          modal.classList.remove('hidden');
+        }
+      }
+    } else {
+      konamiIndex = 0;
+    }
+  });
 }
 
 async function runAnalysis() {
@@ -370,19 +534,68 @@ async function runAnalysis() {
   try {
     const result = await window.tfdApi.analyze(selectedMod, stats, platform, 30, targetSocket, targetCharacter);
     currentAnalysis = result;
+    currentListings = result.listings || [];
 
     emptyState.classList.add('hidden');
     analysisResults.classList.remove('hidden');
 
     renderSummary(result.summary);
     renderChart(result.chartData);
-    renderListings(result.listings);
+    renderListings(currentListings);
+    
+    // Cross-reference live data with our watchlist to find sold/price-changed items
+    await checkWatchlistStatus(currentListings, selectedMod);
   } catch (err) {
     console.error('Analysis failed:', err);
     showToast('Analysis failed: ' + err.message);
   } finally {
     analyzeBtn.disabled = false;
     analyzeBtn.textContent = '📊 Analyze Prices';
+  }
+}
+
+async function checkWatchlistStatus(liveListings, modName) {
+  if (!appSettings.trackedListings || appSettings.trackedListings.length === 0) return;
+  
+  let updated = false;
+  const now = new Date().toISOString();
+  
+  // We only check tracked items that match the mod we just scraped/analyzed
+  for (let item of appSettings.trackedListings) {
+    if (item.modName !== modName) continue;
+    
+    // Find matching listing in the live data
+    const liveMatch = liveListings.find(l => {
+      const liveStatSig = (l.stats || []).filter(s => s.statName && s.statName !== 'null').map(s => s.statName).join('|');
+      const liveSeller = l.seller_name || l.sellerName;
+      return liveSeller === item.sellerName && liveStatSig === item.statSignature;
+    });
+    
+    if (liveMatch) {
+      item.lastSeenAt = now;
+      if (item.price !== liveMatch.price) {
+        item.status = 'Price Changed';
+        item.price = liveMatch.price;
+        updated = true;
+        window.tfdApi.showNotification('Watchlist Alert', `${item.modName} (by ${item.sellerName}) changed price to ${formatPrice(liveMatch.price)} Cal`);
+      } else if (item.status !== 'Active') {
+        item.status = 'Active'; // It came back or was marked incorrectly
+        updated = true;
+      }
+    } else {
+      // It's not in the live data anymore!
+      if (item.status !== 'Sold/Removed') {
+        item.status = 'Sold/Removed';
+        updated = true;
+        window.tfdApi.showNotification('Watchlist Alert', `${item.modName} (by ${item.sellerName}) was Sold or Removed!`);
+      }
+    }
+  }
+  
+  if (updated) {
+    await window.tfdApi.updateSettings({ trackedListings: appSettings.trackedListings });
+    renderWatchlist();
+    showToast('Watchlist statuses updated!');
   }
 }
 
@@ -407,7 +620,7 @@ async function autoScrollBrowser() {
     const res = await window.tfdApi.scroll();
     if (res.success) {
       setStatus('idle', 'Auto-Scroll complete. Ready to extract.');
-      showToast('✅ Auto-Scroll complete! Click Extract Data now.');
+      showToast('✅ Auto-Scroll complete! Auto-extracting now...');
     } else {
       showToast('⚠️ Could not scroll. Is the browser open?');
       setStatus('error', 'Scroll failed');
@@ -454,6 +667,17 @@ async function extractData() {
   }
 }
 
+async function openMarketBrowser() {
+  try {
+    const res = await window.tfdApi.scrape('init', platformSelect.value);
+    if (res && res.status === 'opened') {
+      showToast('🌐 Opening Market Browser...');
+    }
+  } catch (err) {
+    console.error('Failed to open browser:', err);
+  }
+}
+
 // ── Interactive Refresh Loop ──
 let abortRefreshLoop = false;
 
@@ -491,6 +715,13 @@ async function startInteractiveRefresh(listType = 'favorites') {
       showToast('Your Favorites list is empty.');
       return;
     }
+  } else if (listType === 'watchlist') {
+    const activeTracked = (appSettings.trackedListings || []).filter(l => l.status !== 'Sold/Removed');
+    listToRefresh = [...new Set(activeTracked.map(l => l.modName))];
+    if (listToRefresh.length === 0) {
+      showToast('No active tracked items in your Watchlist.');
+      return;
+    }
   } else if (listType === 'all') {
     // Show disclaimer for "All"
     const confirmAll = confirm("WARNING: This will loop through every single item in the database, requiring manual confirmation for each one. This could take a long time.\n\nDo you want to proceed?");
@@ -521,16 +752,20 @@ async function startInteractiveRefresh(listType = 'favorites') {
     }
     
     if (choice === 'yes') {
+      // Ensure browser is open before attempting to navigate
+      await openMarketBrowser();
+      
+      // Give the browser a second to render/load if it was just opened
+      await new Promise(r => setTimeout(r, 2000));
+
       // Step 1: Tell backend to navigate/search
       setStatus('scraping', `Searching for ${mod}...`);
       const navRes = await window.tfdApi.scrapeNavigate(mod);
       if (!navRes.success) {
-        // Fallback: Copy to clipboard and open browser
+        // Fallback: Copy to clipboard
         await navigator.clipboard.writeText(mod).catch(e => console.error('Clipboard failed', e));
         showToast(`Could not inject search. '${mod}' copied to clipboard! Please paste it into the search bar manually.`);
-        await openMarketBrowser();
         // Pause to let the user manually search if injection failed.
-        // We do NOT auto-extract if nav fails because we don't know when they're done.
         continue;
       }
       
@@ -541,12 +776,18 @@ async function startInteractiveRefresh(listType = 'favorites') {
       // Step 3: Extract
       await extractData();
       await new Promise(r => setTimeout(r, 1000)); // Small delay before next prompt
+      
+      // User Preference: Close the browser after every single item is extracted
+      await window.tfdApi.closeBrowser();
     }
   }
   
   if (!abortRefreshLoop) {
     showToast('✅ Finished interactive refresh loop!');
   }
+  
+  // QoL: Automatically close the market browser when the loop finishes or is aborted
+  await window.tfdApi.closeBrowser();
 }
 
 // ── Rendering ──
@@ -712,15 +953,48 @@ function renderListings(listings) {
 
   listingsCount.textContent = `${listings.length} results`;
 
-  listingsGrid.innerHTML = listings.slice(0, 1000).map(l => {
+  const sortSelect = $('listings-sort-select');
+  const sortValue = sortSelect ? sortSelect.value : 'best_match';
+  
+  let sortedListings = [...listings];
+  if (sortValue === 'price_asc') {
+    sortedListings.sort((a, b) => (a.price || 0) - (b.price || 0));
+  } else if (sortValue === 'price_desc') {
+    sortedListings.sort((a, b) => (b.price || 0) - (a.price || 0));
+  } else {
+    sortedListings.sort((a, b) => {
+      if (b.matchScore !== a.matchScore) return (b.matchScore || 0) - (a.matchScore || 0);
+      return (a.price || 0) - (b.price || 0);
+    });
+  }
+
+  listingsGrid.innerHTML = sortedListings.slice(0, 1000).map(l => {
     const matchClass = l.matchType === 'exact' ? 'exact' : l.matchType === 'partial' ? 'partial' : 'subset';
     const matchLabel = l.matchScore !== undefined ? `${l.matchScore}%` : '';
     const statusClass = (l.sellerStatus || '').toLowerCase().includes('online') ? 'online' : 'offline';
     const stats = (l.stats || []).filter(s => s.statName && s.statName !== 'null');
+    
+    // Check if this listing is tracked
+    const statSignature = stats.map(s => s.statName).join('|');
+    const sellerName = l.seller_name || l.sellerName || 'Unknown';
+    const id = `${sellerName}_${statSignature}`;
+    const isTracked = appSettings.trackedListings && appSettings.trackedListings.some(t => t.id === id);
+    const starColor = isTracked ? 'var(--accent-amber)' : 'var(--text-muted)';
+    const starIcon = isTracked ? '⭐' : '☆';
+    
+    const listingData = {
+      sellerName: sellerName,
+      price: l.price,
+      statSignature: statSignature,
+      socketType: l.socket_type || l.socketType || '',
+      requiredRank: l.required_rank || l.requiredRank || ''
+    };
+    const encodedListing = encodeURIComponent(JSON.stringify(listingData));
 
     return `
-      <div class="listing-card">
-        ${matchLabel ? `<div class="listing-card__match ${matchClass}">${matchLabel} match</div>` : ''}
+      <div class="listing-card" style="position:relative;">
+        <button onclick="toggleTrackListing(this, '${encodedListing}')" style="position:absolute; top:12px; right:12px; background:none; border:none; cursor:pointer; font-size:16px; color:${starColor}; z-index:10;" title="${isTracked ? 'Untrack Listing' : 'Track Listing'}">${starIcon}</button>
+        ${matchLabel ? `<div class="listing-card__match ${matchClass}" style="margin-right:24px;">${matchLabel} match</div>` : ''}
         <div class="listing-card__price">${formatPrice(l.price)}<span>Caliber</span></div>
         <div class="listing-card__seller">
           <span class="${statusClass}">●</span>
@@ -769,6 +1043,68 @@ function renderListings(listings) {
 
 function initScrapeStatusListener() {
   // Not used in public version
+}
+
+// ── Background Tracker ──
+let trackerIntervalId = null;
+
+function startBackgroundTracker() {
+  if (trackerIntervalId) clearInterval(trackerIntervalId);
+  const ms = (appSettings.trackInterval || 10) * 60 * 1000;
+  trackerIntervalId = setInterval(executeBackgroundTracking, ms);
+  console.log(`Background tracking started. Interval: ${appSettings.trackInterval}m`);
+}
+
+function stopBackgroundTracker() {
+  if (trackerIntervalId) {
+    clearInterval(trackerIntervalId);
+    trackerIntervalId = null;
+  }
+  console.log('Background tracking stopped.');
+}
+
+async function executeBackgroundTracking() {
+  if (!appSettings.autoTrack || !appSettings.trackedListings || appSettings.trackedListings.length === 0) return;
+  
+  // Get unique module names from the watchlist that are not explicitly Sold/Removed
+  const activeTracked = appSettings.trackedListings.filter(l => l.status !== 'Sold/Removed');
+  if (activeTracked.length === 0) return;
+  
+  const uniqueMods = [...new Set(activeTracked.map(l => l.modName))];
+  
+  for (const mod of uniqueMods) {
+    try {
+      // 1. Open hidden browser
+      await window.tfdApi.scrape('init', appSettings.platform, true);
+      await new Promise(r => setTimeout(r, 2000));
+      
+      // 2. Navigate and search invisibly
+      const navRes = await window.tfdApi.scrapeNavigate(mod);
+      if (!navRes.success) {
+        await window.tfdApi.closeBrowser();
+        continue;
+      }
+      
+      // 3. Wait for scroll invisibly
+      await window.tfdApi.scroll();
+      
+      // 4. Extract data invisibly
+      const extractRes = await window.tfdApi.scrape(mod, appSettings.platform, true);
+      
+      if (extractRes.success && extractRes.count > 0) {
+        // Run analysis silently to get the stats array properly formatted, looking at last 1 day
+        const result = await window.tfdApi.analyze(mod, [], appSettings.platform, 1);
+        await checkWatchlistStatus(result.listings, mod);
+      }
+      
+      // Clean up
+      await window.tfdApi.closeBrowser();
+      
+    } catch (err) {
+      console.error(`Background tracking failed for ${mod}:`, err);
+      await window.tfdApi.closeBrowser();
+    }
+  }
 }
 
 // ── Utilities ──

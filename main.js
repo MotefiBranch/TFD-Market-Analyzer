@@ -3,7 +3,7 @@
  * Orchestrates scraper, database, analysis, and UI.
  */
 
-const { app, BrowserWindow, ipcMain, Tray, Menu, nativeImage } = require('electron');
+const { app, BrowserWindow, ipcMain, Tray, Menu, nativeImage, Notification } = require('electron');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 const { initDatabase } = require('./src/database/schema');
@@ -81,13 +81,28 @@ function registerIPC() {
     else mainWindow?.maximize();
   });
   ipcMain.on('window:close', () => mainWindow?.hide());
+  
+  ipcMain.handle('show-notification', async (_e, title, body) => {
+    if (Notification.isSupported()) {
+      new Notification({ title, body, icon: path.join(__dirname, 'assets', 'icons', 'icon.png') }).show();
+    }
+  });
 
   // Scrape / Extract
-  ipcMain.handle('scrape:run', async (_e, modName, platform) => {
+  ipcMain.handle('scrape:close', async () => {
+    if (marketWindow && !marketWindow.isDestroyed()) {
+      marketWindow.close();
+      marketWindow = null;
+    }
+    return { success: true };
+  });
+
+  ipcMain.handle('scrape:run', async (_e, modName, platform, hidden = false) => {
     try {
       if (!marketWindow || marketWindow.isDestroyed()) {
         marketWindow = new BrowserWindow({
           width: 1200, height: 800,
+          show: !hidden,
           webPreferences: { nodeIntegration: false, contextIsolation: true }
         });
         
@@ -135,25 +150,36 @@ function registerIPC() {
         return { success: false, error: 'Browser not open' };
       }
       
-      const navCode = `
-        return new Promise(resolve => {
+      // Step 0: Debug DOM state
+      const debugCode = `
+        new Promise(resolve => {
           const inputs = Array.from(document.querySelectorAll('input'));
-          // Find an input that likely acts as a search box
-          const searchInput = inputs.find(i => i.placeholder && i.placeholder.toLowerCase().includes('search')) || inputs[0];
+          resolve({
+            foundById: !!document.getElementById('search__input'),
+            foundByClass: !!document.querySelector('.search__input'),
+            totalInputs: inputs.length,
+            placeholders: inputs.map(i => i.placeholder).filter(p => p),
+            ids: inputs.map(i => i.id).filter(id => id),
+            url: window.location.href,
+            readyState: document.readyState
+          });
+        });
+      `;
+      const debugInfo = await marketWindow.webContents.executeJavaScript(debugCode);
+      console.log("[DEBUG] Scrape Navigate DOM Info:", debugInfo);
+
+      // Step 1: Focus and clear the input
+      const focusCode = `
+        new Promise(resolve => {
+          const searchInput = document.getElementById('search__input') || 
+                              document.querySelector('.search__input') || 
+                              document.querySelector('input[type="text"]') ||
+                              document.querySelector('input');
+                              
           if (searchInput) {
-            searchInput.value = "${modName.replace(/"/g, '\\"')}";
+            searchInput.focus();
+            searchInput.value = ''; 
             searchInput.dispatchEvent(new Event('input', { bubbles: true }));
-            searchInput.dispatchEvent(new Event('change', { bubbles: true }));
-            
-            // Try to trigger the search (Enter key)
-            searchInput.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', keyCode: 13, bubbles: true }));
-            searchInput.dispatchEvent(new KeyboardEvent('keyup', { key: 'Enter', keyCode: 13, bubbles: true }));
-            
-            // Alternatively try finding a search button
-            const btns = Array.from(document.querySelectorAll('button'));
-            const searchBtn = btns.find(b => b.textContent.toLowerCase().includes('search') || b.className.toLowerCase().includes('search'));
-            if (searchBtn) searchBtn.click();
-            
             resolve(true);
           } else {
             resolve(false);
@@ -161,8 +187,43 @@ function registerIPC() {
         });
       `;
       
-      const res = await marketWindow.webContents.executeJavaScript(navCode);
-      return { success: res };
+      const focused = await marketWindow.webContents.executeJavaScript(focusCode);
+      if (!focused) {
+        console.error("[DEBUG] Failed to focus any input!");
+        return { success: false, error: 'Could not find search input on page' };
+      }
+
+      // Step 2: Use Electron to physically type the text
+      marketWindow.webContents.insertText(modName);
+
+      // Step 3: Trigger the search
+      const submitCode = `
+        new Promise(resolve => {
+          const searchInput = document.getElementById('search__input') || 
+                              document.querySelector('.search__input') || 
+                              document.querySelector('input[type="text"]') ||
+                              document.querySelector('input');
+                              
+          if (searchInput) {
+            searchInput.dispatchEvent(new Event('input', { bubbles: true }));
+            searchInput.dispatchEvent(new Event('change', { bubbles: true }));
+            
+            const searchBtn = document.querySelector('.search__btn');
+            if (searchBtn) {
+              searchBtn.click();
+            } else {
+              searchInput.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', keyCode: 13, bubbles: true }));
+              searchInput.dispatchEvent(new KeyboardEvent('keyup', { key: 'Enter', keyCode: 13, bubbles: true }));
+            }
+            resolve(true);
+          } else {
+            resolve(false);
+          }
+        });
+      `;
+      
+      await marketWindow.webContents.executeJavaScript(submitCode);
+      return { success: true };
     } catch (err) {
       console.error('Navigate error:', err);
       return { success: false, error: err.message };
@@ -181,22 +242,23 @@ function registerIPC() {
             let lastHeight = 0;
             let unchangedCount = 0;
             
+            // Check every 1 second
             const timer = setInterval(() => {
               window.scrollTo(0, document.body.scrollHeight);
               let currentHeight = document.body.scrollHeight;
               
               if (currentHeight === lastHeight) {
                 unchangedCount++;
-                // Stop if height hasn't changed for ~2.5s (5 ticks) to give lazy loading more time
+                // Wait for 5 full seconds of NO changes before giving up
                 if (unchangedCount >= 5) {
                   clearInterval(timer);
                   resolve(true);
                 }
               } else {
                 lastHeight = currentHeight;
-                unchangedCount = 0;
+                unchangedCount = 0; // Reset counter if it successfully loaded more!
               }
-            }, 500);
+            }, 1000);
           });
         })();
       `;
@@ -247,6 +309,19 @@ function registerIPC() {
         return l.available_characters.some(char => char.name && char.name.toLowerCase().includes(tc));
       });
     }
+
+    // Deduplicate listings (same seller, price, stats, and registration date)
+    const uniqueListingsMap = new Map();
+    for (const l of listings) {
+      const seller = l.seller_name || l.sellerName || 'Unknown';
+      const statsSignature = (l.stats || []).map(s => s.statName).sort().join('|');
+      const regDate = l.reg_date || ''; // Include the "X minutes ago" string
+      const uniqueKey = `${seller}_${l.price}_${statsSignature}_${regDate}`;
+      if (!uniqueListingsMap.has(uniqueKey)) {
+        uniqueListingsMap.set(uniqueKey, l);
+      }
+    }
+    listings = Array.from(uniqueListingsMap.values());
 
     // Rank by stat match
     const ranked = StatMatcher.rankListings(targetStats || [], listings);

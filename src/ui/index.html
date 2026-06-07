@@ -109,6 +109,7 @@
           <button class="btn btn--add btn--full btn--sm" id="extract-btn">⬇️ Extract Data</button>
           <button class="btn btn--secondary btn--full btn--sm mt-8" id="save-tracked-btn">💾 Save to Favorites</button>
           <button class="btn btn--secondary btn--full btn--sm" id="refresh-favorites-btn" style="border-color:var(--accent-amber);color:var(--accent-amber);">🔄 Refresh Favorites</button>
+          <button class="btn btn--secondary btn--full btn--sm" id="refresh-watchlist-btn" style="border-color:var(--accent-blue);color:var(--accent-blue);">🔄 Refresh Watchlist</button>
           <button class="btn btn--secondary btn--full btn--sm" id="refresh-all-btn" style="border-color:var(--text-danger);color:var(--text-danger);">⚠️ Refresh Entire Database</button>
         </div>
       </div>
@@ -127,10 +128,18 @@
       </div>
 
       <!-- Saved Favorites Section -->
-      <div class="sidebar__section" style="flex:1;">
+      <div class="sidebar__section">
         <div class="sidebar__title"><span class="dot" style="background:var(--accent-amber);box-shadow:0 0 6px rgba(245,158,11,0.4);"></span> Saved Favorites</div>
-        <ul class="tracked-list" id="tracked-list">
+        <ul class="tracked-list" id="tracked-list" style="max-height: 150px; overflow-y: auto;">
           <li style="font-size:12px;color:var(--text-muted);padding:8px 0;">No favorites yet</li>
+        </ul>
+      </div>
+
+      <!-- Watchlist Section -->
+      <div class="sidebar__section" style="flex:1; display:flex; flex-direction:column;">
+        <div class="sidebar__title"><span class="dot" style="background:var(--accent-blue);box-shadow:0 0 6px rgba(59,130,246,0.4);"></span> Watchlist</div>
+        <ul class="tracked-list" id="watchlist-list" style="flex:1; overflow-y:auto; margin-bottom:0;">
+          <li style="font-size:12px;color:var(--text-muted);padding:8px 0;">No tracked listings</li>
         </ul>
       </div>
 
@@ -138,14 +147,42 @@
       <div class="sidebar__section">
         <div class="flex items-center justify-between">
           <span style="font-size:11px;color:var(--text-muted);">Platform</span>
-          <select id="platform-select" style="padding:4px 8px;background:var(--bg-elevated);border:1px solid var(--glass-border);border-radius:var(--radius-sm);color:var(--text-primary);font-size:12px;">
-            <option value="PC">PC (Steam)</option>
+          <select id="platform-select" style="background:var(--bg-elevated);border:1px solid var(--glass-border);color:var(--text-primary);padding:2px 6px;border-radius:4px;font-size:11px;">
+            <option value="PC">PC</option>
             <option value="PS">PlayStation</option>
             <option value="XBOX">Xbox</option>
           </select>
         </div>
       </div>
     </aside>
+
+    <!-- Developer Settings Modal -->
+    <div id="dev-settings-modal" class="hidden" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:9999;display:none;justify-content:center;align-items:center;">
+      <div style="background:var(--bg-elevated);border:1px solid var(--glass-border);border-radius:8px;padding:20px;width:350px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+          <h3 style="margin:0;color:var(--accent-green);">🛠️ Developer Settings</h3>
+          <button id="close-dev-settings-btn" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px;">✕</button>
+        </div>
+        <p style="font-size:12px;color:var(--text-secondary);margin-bottom:20px;">
+          You have unlocked developer mode. These features are intended for testing and bypass ToS constraints.
+        </p>
+        <div class="flex items-center justify-between" style="margin-bottom: 12px; padding: 12px; background:rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 6px;">
+          <span style="font-size:12px;color:var(--text-danger);font-weight:600;">⚠️ Background Auto-Track</span>
+          <input type="checkbox" id="auto-track-toggle" style="cursor:pointer; transform: scale(1.2);">
+        </div>
+        
+        <div class="flex items-center justify-between" style="margin-bottom: 8px;">
+          <span style="font-size:12px;color:var(--text-muted);">Track Interval</span>
+          <select id="track-interval-select" style="background:var(--bg-panel);border:1px solid var(--glass-border);color:var(--text-primary);padding:4px 8px;border-radius:4px;font-size:12px;">
+            <option value="1">1 Minute (Test)</option>
+            <option value="5">5 Minutes</option>
+            <option value="10">10 Minutes</option>
+            <option value="30">30 Minutes</option>
+            <option value="60">60 Minutes</option>
+          </select>
+        </div>
+      </div>
+    </div>
 
     <!-- Main Content Area -->
     <main class="main-content" id="main-content">

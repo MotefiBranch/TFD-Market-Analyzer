@@ -15,9 +15,10 @@ https://github.com/user-attachments/assets/f3192ab3-cb39-49f1-95b9-ff1ade6f0a33
 
 - **True Weighted Statistics**: Most price aggregators simply take the average of all unique price points. The TFD Market Analyzer weights prices by listing volume, ensuring that 200 listings at 20 Caliber carry vastly more mathematical weight than 1 listing at 2,000 Caliber.
 - **Predictive Pricing Estimator**: When searching for highly specific or rare stat combinations (e.g., "HP Heal" + "Skill Cooldown") that currently have zero live listings, the analyzer leverages your historical database to calculate the global premium of those specific stats and intelligently estimates a True Market Value.
+- **Listing Watchlist**: Track specific seller listings by clicking the star icon. The analyzer automatically cross-references your Watchlist against fresh market data to notify you if a tracked item's price changes or if it is sold/removed.
 - **Character Optimization & God Rolls**: Search the global database for your specific Descendant, see their community-accepted God Roll stats, and instantly filter the market to find matching, equippable items.
 - **Intelligent Stat Parsing**: Directly reads Nexon's hidden HTML properties to perfectly color-code standard buffs (Green), penalties/debuffs (Red), and multi-tier multiplicative bonuses (`[x]`), eliminating the confusion of the official market's generic text.
-- **Attended Refresh Macro**: Features an interactive "Refresh Favorites" and "Refresh Database" loop. It prompts you to confirm each item, allowing you to update your tracked modules in minutes while remaining technically "at the keyboard" to evade automated bot detection.
+- **Attended Refresh Macros**: Features interactive "Refresh Favorites", "Refresh Watchlist", and "Refresh Database" loops. It safely queues up items and prompts you to confirm each one, allowing you to update your tracked modules in minutes while remaining technically "at the keyboard" to evade automated bot detection.
 - **Stat Matcher**: Input your ideal stats and the tool will automatically parse and rank the live listings to find exactly what you are looking for.
 - **Local Persistence**: All historical pricing data is saved securely to a local SQLite database, building a localized historical price trend chart the more you use it.
 
@@ -53,6 +54,9 @@ To compile this into a standalone `.exe` file that doesn't require the terminal:
 ```bash
 npm run build:win
 ```
+
+## Smart Duplicate Protection
+- **No Unique Listing IDs:** Nexon's web market does not expose unique database IDs or serial numbers for items in their HTML DOM. To track items in the Watchlist and filter duplicates, this tool relies on a composite key (`SellerName` + `Stats` + `Price` + `RegistrationTime`). If a single seller lists multiple identical clones of the exact same item at the exact same time, the system will filter out the duplicates to keep your interface clean. However, if a seller genuinely lists multiple identical clones sequentially, the system accurately discerns the time difference and correctly displays them as separate valid listings!
 
 ## Credits & Acknowledgements
 

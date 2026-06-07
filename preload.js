@@ -7,11 +7,15 @@ const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('tfdApi', {
   // ── Scraper ──
-  scrape: (modName, platform) => ipcRenderer.invoke('scrape:run', modName, platform),
+  scrape: (modName, platform, hidden) => ipcRenderer.invoke('scrape:run', modName, platform, hidden),
   scroll: () => ipcRenderer.invoke('scrape:scroll'),
   scrapeNavigate: (modName) => ipcRenderer.invoke('scrape:navigate', modName),
   getScrapeStatus: () => ipcRenderer.invoke('scrape:status'),
   abortScrape: () => ipcRenderer.invoke('scrape:abort'),
+  closeBrowser: () => ipcRenderer.invoke('scrape:close'),
+
+  // ── App Features ──
+  showNotification: (title, body) => ipcRenderer.invoke('show-notification', title, body),
 
   // ── Analysis ──
   searchMods: (query) => ipcRenderer.invoke('analysis:search', query),
