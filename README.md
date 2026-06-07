@@ -1,3 +1,5 @@
+
+
 # TFD Market Analyzer
 
 A powerful, mathematically accurate market analysis tool for **The First Descendant**. 
@@ -10,7 +12,7 @@ This application serves as a desktop overlay companion that allows you to calcul
 
 
 https://github.com/user-attachments/assets/f3192ab3-cb39-49f1-95b9-ff1ade6f0a33
-
+https://github.com/user-attachments/assets/b480a282-8da9-4551-9257-54342091df55
 *
 
 ## Features
