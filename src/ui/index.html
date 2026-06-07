@@ -14,6 +14,7 @@
       <span>TFD Market Analyzer</span>
     </div>
     <div class="title-bar__controls">
+      <button class="title-bar__btn" id="btn-open-custom-desc-modal" title="Settings" style="font-size: 14px;">⚙️</button>
       <button class="title-bar__btn" id="btn-minimize" title="Minimize">─</button>
       <button class="title-bar__btn" id="btn-maximize" title="Maximize">□</button>
       <button class="title-bar__btn close" id="btn-close" title="Close">✕</button>
@@ -36,6 +37,12 @@
             <span id="selected-mod-name" style="font-size:14px;font-weight:700;color:var(--accent-blue);"></span>
             <button class="btn--ghost btn--sm" id="clear-mod" style="font-size:11px;">Clear</button>
           </div>
+        </div>
+        
+        <div style="margin-top: 12px;">
+          <select id="db-history-select" class="search-input" style="width:100%; padding:6px 10px; font-size:12px; background:var(--bg-panel); border-color:var(--glass-border);">
+            <option value="">📂 Local Database History...</option>
+          </select>
         </div>
       </div>
 
@@ -60,14 +67,25 @@
              <option value="Freyna">
              <option value="Ultimate Freyna">
              <option value="Yujin">
+             <option value="Ultimate Yujin">
              <option value="Enzo">
              <option value="Luna">
+             <option value="Ultimate Luna">
              <option value="Sharen">
+             <option value="Ultimate Sharen">
              <option value="Blair">
+             <option value="Ultimate Blair">
              <option value="Jayber">
              <option value="Kyle">
              <option value="Esiemo">
+             <option value="Ultimate Esiemo">
              <option value="Hailey">
+             <option value="Dia">
+             <option value="Harris">
+             <option value="Ines">
+             <option value="Keelan">
+             <option value="Nell">
+             <option value="Serena">
           </datalist>
         </div>
         <div id="character-optimizer-prompt" class="hidden" style="background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.2); border-radius:6px; padding:10px; font-size:12px;">
@@ -113,6 +131,54 @@
           <button class="btn btn--secondary btn--full btn--sm" id="refresh-all-btn" style="border-color:var(--text-danger);color:var(--text-danger);">⚠️ Refresh Entire Database</button>
         </div>
       </div>
+
+    <!-- Custom Descendant Modal -->
+    <div id="custom-desc-modal" class="hidden" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:9999;display:none;justify-content:center;align-items:center;">
+      <div style="background:var(--bg-elevated);border:1px solid var(--glass-border);border-radius:8px;padding:20px;width:380px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+          <h3 style="margin:0;color:var(--accent-blue);">⚙️ Manage Custom Descendants</h3>
+          <button id="close-custom-desc-modal" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px;">✕</button>
+        </div>
+        
+        <div style="margin-bottom:16px;">
+          <input type="text" id="custom-desc-name" class="search-input mb-2" placeholder="Descendant Name (e.g. Nell)" style="width:100%; padding:8px 12px; font-size:13px; margin-bottom:8px;">
+          
+          <select id="custom-desc-attribute" class="search-input mb-2" style="width:100%; padding:8px 12px; font-size:13px; margin-bottom:8px; background:var(--bg-panel);">
+            <option value="" disabled selected>Select Attribute...</option>
+            <option value="Non-Attribute">Non-Attribute</option>
+            <option value="Fire">Fire</option>
+            <option value="Chill">Chill</option>
+            <option value="Electric">Electric</option>
+            <option value="Toxic">Toxic</option>
+          </select>
+
+          <select id="custom-desc-archetype" class="search-input mb-2" style="width:100%; padding:8px 12px; font-size:13px; margin-bottom:8px; background:var(--bg-panel);">
+            <option value="" disabled selected>Select Primary Archetype...</option>
+            <option value="Tech">Tech</option>
+            <option value="Dimension">Dimension</option>
+            <option value="Singular">Singular</option>
+            <option value="Fusion">Fusion</option>
+          </select>
+
+          <select id="custom-desc-archetype-2" class="search-input mb-2" style="width:100%; padding:8px 12px; font-size:13px; margin-bottom:12px; background:var(--bg-panel);">
+            <option value="">Secondary Archetype (Optional)...</option>
+            <option value="Tech">Tech</option>
+            <option value="Dimension">Dimension</option>
+            <option value="Singular">Singular</option>
+            <option value="Fusion">Fusion</option>
+          </select>
+
+          <button class="btn btn--primary btn--full" id="btn-add-custom-desc">Add to Database</button>
+        </div>
+        
+        <hr style="border:none; border-top:1px solid var(--glass-border); margin:16px 0;">
+        
+        <h4 style="margin:0 0 10px 0;color:var(--text-secondary);font-size:12px;text-transform:uppercase;letter-spacing:1px;">History (Saved)</h4>
+        <ul id="custom-desc-history" style="list-style:none; padding:0; margin:0; max-height:150px; overflow-y:auto;" class="history-list">
+          <li style="font-size:12px;color:var(--text-muted);text-align:center;padding:10px;">No custom descendants found</li>
+        </ul>
+      </div>
+    </div>
 
       <!-- Refresh Modal -->
       <div id="refresh-modal" class="hidden" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:9999;display:none;justify-content:center;align-items:center;">
@@ -237,9 +303,18 @@
         </div>
 
         <!-- Listings Grid -->
-        <div class="listings-header">
-          <h3 id="listings-title">Matching Listings</h3>
-          <span class="listings-count" id="listings-count">0 results</span>
+        <div class="listings-header" style="display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <h3 id="listings-title" style="display:inline-block; margin-right:12px;">Matching Listings</h3>
+            <span class="listings-count" id="listings-count">0 results</span>
+          </div>
+          <div>
+            <select id="listings-sort-select" class="search-input" style="padding:4px 8px; font-size:12px; width:auto; display:inline-block; border-color:var(--glass-border); background:var(--bg-panel);">
+              <option value="price_asc" selected>Lowest Price</option>
+              <option value="price_desc">Highest Price</option>
+              <option value="best_match">Best Match</option>
+            </select>
+          </div>
         </div>
         <div class="listings-grid" id="listings-grid"></div>
       </div>
