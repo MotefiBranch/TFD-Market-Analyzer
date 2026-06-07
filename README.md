@@ -11,8 +11,11 @@ This application serves as a desktop overlay companion that allows you to calcul
 
 
 
-https://github.com/user-attachments/assets/b480a282-8da9-4551-9257-54342091df55
-*
+
+
+https://github.com/user-attachments/assets/bc1003d0-02c5-456f-a75d-c111f9054515
+
+
 
 ## Features
 
