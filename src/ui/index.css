@@ -512,7 +512,7 @@ select option {
   transition: all var(--transition-base);
   position: relative;
   overflow: hidden;
-  height: 175px;
+  height: 190px;
 }
 
 .listing-card:hover {
