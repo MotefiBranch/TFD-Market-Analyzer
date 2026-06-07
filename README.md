@@ -7,6 +7,8 @@ This application serves as a desktop overlay companion that allows you to calcul
 ## Screenshots & Demo
 *<img width="1392" height="891" alt="image 1" src="https://github.com/user-attachments/assets/82fb205c-2388-4b63-845e-651e3070af3b" /> 
 
+
+
 https://github.com/user-attachments/assets/f3192ab3-cb39-49f1-95b9-ff1ade6f0a33
 
 *
