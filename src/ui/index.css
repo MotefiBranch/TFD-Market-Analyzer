@@ -90,8 +90,10 @@ html, body {
 
 .title-bar__brand .icon {
   width: 18px; height: 18px;
-  background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
-  border-radius: 4px;
+  background-image: url('../../assets/icons/icon.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
 .title-bar__controls {

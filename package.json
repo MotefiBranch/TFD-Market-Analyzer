@@ -1,7 +1,7 @@
 {
   "name": "tfd-market-analyzer",
   "version": "1.0.0",
-  "description": "The First Descendant Market Analysis Bot — Ancestral Mod Price Tracker",
+  "description": "The First Descendant Market Analysis Bot — Ancestral Module Price Tracker",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
@@ -38,9 +38,9 @@
     ],
     "win": {
       "target": "nsis",
-      "icon": "assets/icons/icon.ico"
+      "icon": "assets/icons/icon.png"
     }
   },
-  "author": "TFD Market Analyzer",
+  "author": "MotefiBranch",
   "license": "MIT"
 }
